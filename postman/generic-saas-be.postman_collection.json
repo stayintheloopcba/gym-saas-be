@@ -1,0 +1,1081 @@
+{
+  "info": {
+    "name": "generic-saas-be",
+    "description": "Colección de la API de generic-saas-be. Los tokens viajan en cookies httpOnly (access_token / refresh_token); Postman las maneja automáticamente en su cookie jar, no hace falta copiar tokens manualmente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "orgId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "userId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "invitationId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "invitationToken",
+      "value": "paste-token-here"
+    },
+    {
+      "key": "resourceId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "roleId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"plain12345\",\n  \"name\": \"Demo User\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Crea un usuario LOCAL y setea las cookies de sesión. El body NO devuelve tokens."
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"plain12345\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Verifica credenciales y setea las cookies access_token / refresh_token (httpOnly)."
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Devuelve el perfil del usuario autenticado (requiere cookie access_token)."
+          }
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Renueva el access_token usando la cookie refresh_token."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Limpia las cookies de sesión."
+          }
+        },
+        {
+          "name": "Google — iniciar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/google",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "google"
+              ]
+            },
+            "description": "Redirige al consentimiento de Google. Abrir en el navegador (no en Postman) para completar el flujo OAuth."
+          }
+        },
+        {
+          "name": "Google — callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/google/callback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "google",
+                "callback"
+              ]
+            },
+            "description": "Endpoint al que Google redirige tras el consentimiento. Setea cookies y redirige al frontend."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Organizations",
+      "description": "CRUD de organizaciones y selección de la organización activa (cookie httpOnly active_org). Todas requieren la cookie access_token.",
+      "item": [
+        {
+          "name": "Create organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Inc\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organizations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations"
+              ]
+            },
+            "description": "Crea la organización, hace al creador OWNER y la deja como organización activa (setea active_org)."
+          }
+        },
+        {
+          "name": "List my organizations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations"
+              ]
+            },
+            "description": "Organizaciones donde el usuario tiene membresía activa, con su rol en cada una."
+          }
+        },
+        {
+          "name": "Get organization by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}"
+              ]
+            },
+            "description": "Devuelve la organización si el usuario es miembro (403 si no lo es)."
+          }
+        },
+        {
+          "name": "Rename organization",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme S.A.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}"
+              ]
+            },
+            "description": "Renombra la organización (requiere rol OWNER o ADMIN)."
+          }
+        },
+        {
+          "name": "Delete organization",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}"
+              ]
+            },
+            "description": "Soft delete de la organización (requiere rol OWNER). El slug queda reutilizable."
+          }
+        },
+        {
+          "name": "Select active organization",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/select",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "select"
+              ]
+            },
+            "description": "Setea la cookie active_org a esta organización (solo si el usuario es miembro)."
+          }
+        },
+        {
+          "name": "Clear active organization",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/select/clear",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "select",
+                "clear"
+              ]
+            },
+            "description": "Limpia la cookie active_org."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Members",
+      "description": "Miembros de una organización. Requieren cookie access_token + organización activa (active_org) que coincida con :id.",
+      "item": [
+        {
+          "name": "List members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "members"
+              ]
+            },
+            "description": "Miembros activos con su perfil público y rol."
+          }
+        },
+        {
+          "name": "Remove member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/members/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "members",
+                "{{userId}}"
+              ]
+            },
+            "description": "Remueve (soft delete) un miembro (requiere OWNER/ADMIN; no se puede remover al único OWNER)."
+          }
+        },
+        {
+          "name": "Change member role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/members/{{userId}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "members",
+                "{{userId}}",
+                "role"
+              ]
+            },
+            "description": "Cambia el rol (de sistema) de un miembro. Respeta jerarquía y el invariante de único OWNER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Grant/deny member permission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/members/{{userId}}/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "members",
+                "{{userId}}",
+                "permissions"
+              ]
+            },
+            "description": "Override de un permiso a nivel usuario (sin cambiar su rol). Requiere permissions:manage.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissionCode\": \"members:invite\",\n  \"value\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove member permission override",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/members/{{userId}}/permissions?code=members:invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "members",
+                "{{userId}}",
+                "permissions?code=members:invite"
+              ]
+            },
+            "description": "Quita un override de permiso del usuario. Requiere permissions:manage."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "description": "CRUD de roles custom y asignación de permisos (RABAC).",
+      "item": [
+        {
+          "name": "Create role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles"
+              ]
+            },
+            "description": "Crea un rol custom (hierarchyLevel: 1=SELF, 5=ORGANIZATION). Requiere roles:create.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Editor\",\n  \"description\": \"Custom role\",\n  \"hierarchyLevel\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "List roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles"
+              ]
+            },
+            "description": "Lista roles de sistema + custom de la organización. Requiere roles:read."
+          }
+        },
+        {
+          "name": "Assign custom role to member",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/members/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "{{roleId}}",
+                "members",
+                "{{userId}}"
+              ]
+            },
+            "description": "Asigna un rol custom a un miembro sin cambiar su rol de sistema. Requiere members:update_role."
+          }
+        },
+        {
+          "name": "Clear member custom role",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/assignments/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "assignments",
+                "{{userId}}"
+              ]
+            },
+            "description": "Quita el rol custom del miembro y conserva su rol de sistema. Requiere members:update_role."
+          }
+        },
+        {
+          "name": "Update role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "{{roleId}}"
+              ]
+            },
+            "description": "Actualiza un rol custom (los de sistema no se editan). Requiere roles:update.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Editor v2\",\n  \"hierarchyLevel\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete role",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "{{roleId}}"
+              ]
+            },
+            "description": "Elimina un rol custom que no esté en uso. Requiere roles:delete."
+          }
+        },
+        {
+          "name": "Bulk assign permissions to role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "{{roleId}}",
+                "permissions"
+              ]
+            },
+            "description": "Asigna/deniega varios permisos a un rol. Requiere permissions:manage.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissions\": [\n    {\n      \"permissionCode\": \"resources:read\",\n      \"value\": true\n    },\n    {\n      \"permissionCode\": \"resources:update\",\n      \"value\": true\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Assign permission to role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "{{roleId}}",
+                "permissions"
+              ]
+            },
+            "description": "Asigna/deniega un permiso a un rol. Requiere permissions:manage.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissionCode\": \"resources:create\",\n  \"value\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove role permission",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/permissions?code=resources:create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "roles",
+                "{{roleId}}",
+                "permissions?code=resources:create"
+              ]
+            },
+            "description": "Quita una asignación de permiso del rol. Requiere permissions:manage."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "description": "Catálogo y matriz de permisos para administración.",
+      "item": [
+        {
+          "name": "Get my effective permissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/me/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "me",
+                "permissions"
+              ]
+            },
+            "description": "Devuelve rol, rol custom, alcance y permisos efectivos del miembro autenticado en la organización activa."
+          }
+        },
+        {
+          "name": "List permissions catalog",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/permissions/catalog",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "permissions",
+                "catalog"
+              ]
+            },
+            "description": "Lista los permisos disponibles. Requiere permissions:manage o roles:read."
+          }
+        },
+        {
+          "name": "Get permissions matrix",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/permissions/matrix?resource=resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "permissions",
+                "matrix?resource=resources"
+              ]
+            },
+            "description": "Matriz roles × permisos (filtro opcional ?resource=). Requiere permissions:manage o roles:read."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invitations",
+      "description": "Ciclo de vida de invitaciones. Sin mailer: el token se devuelve en la respuesta y se acepta con él.",
+      "item": [
+        {
+          "name": "Create invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invitee@example.com\",\n  \"role\": \"MEMBER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/invitations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "invitations"
+              ]
+            },
+            "description": "Invita por email (requiere OWNER/ADMIN + org activa). Idempotente sobre invitaciones PENDING. Devuelve el token."
+          }
+        },
+        {
+          "name": "List pending invitations (org)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/{{orgId}}/invitations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizations",
+                "{{orgId}}",
+                "invitations"
+              ]
+            },
+            "description": "Invitaciones PENDING de la organización (requiere OWNER/ADMIN + org activa)."
+          }
+        },
+        {
+          "name": "List my invitations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invitations/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invitations",
+                "mine"
+              ]
+            },
+            "description": "Invitaciones PENDING y no expiradas dirigidas al email del usuario autenticado."
+          }
+        },
+        {
+          "name": "Revoke invitation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invitations/{{invitationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invitations",
+                "{{invitationId}}"
+              ]
+            },
+            "description": "Revoca una invitación PENDING (requiere OWNER/ADMIN de su organización)."
+          }
+        },
+        {
+          "name": "Accept invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invitations/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invitations",
+                "accept"
+              ]
+            },
+            "description": "Acepta la invitación (el email del usuario debe coincidir). Crea la membresía con el rol invitado."
+          }
+        },
+        {
+          "name": "Decline invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invitations/decline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invitations",
+                "decline"
+              ]
+            },
+            "description": "Rechaza la invitación (el email del usuario debe coincidir). No crea membresía."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resources",
+      "description": "CRUD multi-tenant. Requiere access_token y una cookie active_org válida.",
+      "item": [
+        {
+          "name": "Create resource",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Example resource\",\n  \"description\": \"Optional description\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            },
+            "description": "Crea un resource dentro de la organización activa."
+          }
+        },
+        {
+          "name": "List resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources?page=1&limit=10&search=&sortBy=createdAt&sortOrder=desc&status=ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "description": "Lista paginada, filtrada y ordenada exclusivamente dentro de la organización activa."
+          }
+        },
+        {
+          "name": "Get resource",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{resourceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                "{{resourceId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update resource",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated resource\",\n  \"status\": \"INACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{resourceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                "{{resourceId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete resource",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{resourceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                "{{resourceId}}"
+              ]
+            },
+            "description": "Soft delete limitado a la organización activa."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Onboarding",
+      "item": [
+        {
+          "name": "Onboarding status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "onboarding",
+                "status"
+              ]
+            },
+            "description": "Señal para el ruteo onboarding-vs-dashboard: si necesita onboarding, cantidad de orgs, organización activa e invitaciones pendientes."
+          }
+        }
+      ]
+    }
+  ]
+}
