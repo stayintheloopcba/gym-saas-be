@@ -46,3 +46,21 @@ export class AlreadyMemberError extends DomainError {
     super('This user is already a member of the organization');
   }
 }
+
+/** El `roleId` no corresponde a ningún rol del catálogo. */
+export class UnknownRoleError extends DomainError {
+  readonly status = 404;
+
+  constructor(roleId: string) {
+    super(`Unknown role: ${roleId}`);
+  }
+}
+
+/** El rol `owner` no es invitable: solo se otorga al crear la organización. */
+export class OwnerRoleNotInvitableError extends DomainError {
+  readonly status = 409;
+
+  constructor() {
+    super('The owner role cannot be invited');
+  }
+}

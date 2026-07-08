@@ -1,9 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsIn, MaxLength } from 'class-validator';
-import { MembershipRole } from '../../../../common/enums/membership-role.enum';
-
-/** Roles que se pueden asignar al invitar: nunca `OWNER` (invariante de único owner). */
-const INVITABLE_ROLES = [MembershipRole.ADMIN, MembershipRole.MEMBER, MembershipRole.VIEWER];
+import { IsEmail, IsUUID, MaxLength } from 'class-validator';
 
 export class CreateInvitationDto {
   @ApiProperty({ example: 'member@example.com', format: 'email', maxLength: 320 })
@@ -11,7 +7,7 @@ export class CreateInvitationDto {
   @MaxLength(320)
   email: string;
 
-  @ApiProperty({ enum: INVITABLE_ROLES, example: MembershipRole.MEMBER })
-  @IsIn(INVITABLE_ROLES)
-  role: MembershipRole;
+  @ApiProperty({ format: 'uuid', description: 'Catalog role id. The owner role cannot be invited.' })
+  @IsUUID()
+  roleId: string;
 }

@@ -1,97 +1,72 @@
 import { Repository } from 'typeorm';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
+import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
 import { Membership } from '../../memberships/domain/membership.entity';
-import { PERMISSIONS } from '../domain/permission-key';
-import { PermissionAssignment } from '../domain/permission-assignment.entity';
+import { RolePermission } from '../domain/role-permission.entity';
 import { Role } from '../domain/role.entity';
 import { TypeOrmPermissionRepository } from './typeorm-permission.repository';
 
 describe('TypeOrmPermissionRepository', () => {
   let memberships: { findOne: jest.Mock };
-  let queryBuilder: Record<string, jest.Mock>;
-  let assignments: { createQueryBuilder: jest.Mock };
   let roles: { findOne: jest.Mock };
+  let rolePermissions: { find: jest.Mock };
   let repository: TypeOrmPermissionRepository;
 
   beforeEach(() => {
     memberships = { findOne: jest.fn() };
-    queryBuilder = {
-      innerJoin: jest.fn().mockReturnThis(),
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      getMany: jest.fn().mockResolvedValue([]),
-    };
-    assignments = { createQueryBuilder: jest.fn(() => queryBuilder) };
     roles = { findOne: jest.fn() };
+    rolePermissions = { find: jest.fn().mockResolvedValue([]) };
     repository = new TypeOrmPermissionRepository(
       memberships as unknown as Repository<Membership>,
-      assignments as unknown as Repository<PermissionAssignment>,
       roles as unknown as Repository<Role>,
+      rolePermissions as unknown as Repository<RolePermission>,
     );
   });
 
   it('returns null when the user has no active membership', async () => {
     memberships.findOne.mockResolvedValue(null);
 
-    await expect(repository.findAssignment('user-1', 'org-1')).resolves.toBeNull();
+    await expect(repository.findMembershipRole('user-1', 'org-1')).resolves.toBeNull();
   });
 
-  it('returns the system role and custom role id from the membership', async () => {
-    memberships.findOne.mockResolvedValue({ role: MembershipRole.ADMIN, roleId: 'role-admin' });
+  it('returns null when the membership references a role that no longer exists', async () => {
+    memberships.findOne.mockResolvedValue({ roleId: 'role-1' });
+    roles.findOne.mockResolvedValue(null);
 
-    await expect(repository.findAssignment('user-1', 'org-1')).resolves.toEqual({
-      membershipRole: MembershipRole.ADMIN,
-      customRoleId: 'role-admin',
-    });
+    await expect(repository.findMembershipRole('user-1', 'org-1')).resolves.toBeNull();
   });
 
-  it('returns an empty list when no permission codes are requested', async () => {
-    await expect(
-      repository.findGrants({ organizationId: 'org-1', userId: 'user-1', permissionCodes: [] }),
-    ).resolves.toEqual([]);
-    expect(assignments.createQueryBuilder).not.toHaveBeenCalled();
-  });
-
-  it('queries only user-level grants when there is no custom role', async () => {
-    await repository.findGrants({
-      organizationId: 'org-1',
-      userId: 'user-1',
-      permissionCodes: [PERMISSIONS.MEMBERS_INVITE],
+  it('returns the catalog role assigned to the membership', async () => {
+    memberships.findOne.mockResolvedValue({ roleId: 'role-1' });
+    roles.findOne.mockResolvedValue({
+      id: 'role-1',
+      key: 'admin',
+      name: 'Administrador',
+      hierarchyLevel: HierarchyLevel.ORGANIZATION,
     });
 
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith('assignment.user_id = :userId', { userId: 'user-1' });
-  });
-
-  it('queries user and role grants when there is a custom role', async () => {
-    await repository.findGrants({
-      organizationId: 'org-1',
-      userId: 'user-1',
+    await expect(repository.findMembershipRole('user-1', 'org-1')).resolves.toEqual({
       roleId: 'role-1',
-      permissionCodes: [PERMISSIONS.MEMBERS_INVITE],
+      roleKey: 'admin',
+      roleName: 'Administrador',
+      hierarchyLevel: HierarchyLevel.ORGANIZATION,
     });
-
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
-      '(assignment.user_id = :userId OR assignment.role_id = :roleId)',
-      { userId: 'user-1', roleId: 'role-1' },
-    );
   });
 
-  it('maps rows to grants, deriving the level from the subject', async () => {
-    queryBuilder.getMany.mockResolvedValue([
-      { permissionCode: PERMISSIONS.MEMBERS_INVITE, value: true, precedence: 10, userId: 'user-1', roleId: null },
-      { permissionCode: PERMISSIONS.RESOURCES_READ, value: false, precedence: 5, userId: null, roleId: 'role-1' },
-    ]);
+  it('returns the permission codes granted to a role', async () => {
+    rolePermissions.find.mockResolvedValue([{ permissionCode: 'members:read' }, { permissionCode: 'members:invite' }]);
 
-    await expect(
-      repository.findGrants({
-        organizationId: 'org-1',
-        userId: 'user-1',
-        roleId: 'role-1',
-        permissionCodes: [PERMISSIONS.MEMBERS_INVITE, PERMISSIONS.RESOURCES_READ],
-      }),
-    ).resolves.toEqual([
-      { permissionCode: PERMISSIONS.MEMBERS_INVITE, value: true, precedence: 10, level: 'user' },
-      { permissionCode: PERMISSIONS.RESOURCES_READ, value: false, precedence: 5, level: 'role' },
-    ]);
+    await expect(repository.findPermissionCodes('role-1')).resolves.toEqual(['members:read', 'members:invite']);
+  });
+
+  it('returns a role summary, or null if the role does not exist', async () => {
+    roles.findOne.mockResolvedValue({ id: 'role-1', key: 'admin', name: 'Administrador' });
+    await expect(repository.findRoleSummary('role-1')).resolves.toEqual({
+      id: 'role-1',
+      key: 'admin',
+      name: 'Administrador',
+    });
+
+    roles.findOne.mockResolvedValue(null);
+    await expect(repository.findRoleSummary('role-2')).resolves.toBeNull();
   });
 });

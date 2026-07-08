@@ -1,12 +1,11 @@
 import { Column, Entity, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { InvitationStatus } from '../../../common/enums/invitation-status.enum';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
 
 /**
  * Agregado `Invitation`: invita por email a alguien que aún no es miembro de una
- * organización, con un rol objetivo. Lleva un `token` opaco (se busca al aceptar),
- * un `status` y un `expiresAt` (`now + INVITATION_TTL`).
+ * organización, con un rol objetivo del catálogo global. Lleva un `token` opaco
+ * (se busca al aceptar), un `status` y un `expiresAt` (`now + INVITATION_TTL`).
  *
  * Hereda de `BaseEntity`: UUID + auditoría + soft delete.
  */
@@ -21,8 +20,9 @@ export class Invitation extends BaseEntity {
   @Column({ type: 'varchar', length: 320 })
   public email: string;
 
-  @Column({ type: 'enum', enum: MembershipRole })
-  public role: MembershipRole;
+  @Index()
+  @Column({ name: 'role_id', type: 'uuid' })
+  public roleId: string;
 
   /** Token opaco (`crypto.randomBytes`), único; se entrega al invitado. */
   @Index({ unique: true })

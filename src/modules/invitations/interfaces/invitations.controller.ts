@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -39,12 +40,15 @@ import { ACCESS_TOKEN_SECURITY, ACTIVE_ORG_SECURITY } from '../../../config/open
 import { CurrentUser } from '../../auth/interfaces/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/interfaces/jwt-auth.guard';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
+import { PERMISSION_REPOSITORY } from '../../permissions/domain/permission.repository';
+import type { PermissionRepository } from '../../permissions/domain/permission.repository';
 import type { UserPublicProfile } from '../../users/application/user-public-profile';
 import { AcceptInvitationUseCase } from '../application/accept-invitation.use-case';
 import { CreateInvitationUseCase } from '../application/create-invitation.use-case';
 import { DeclineInvitationUseCase } from '../application/decline-invitation.use-case';
 import { ListMyInvitationsUseCase, ListPendingInvitationsUseCase } from '../application/list-invitations.use-cases';
 import { RevokeInvitationUseCase } from '../application/revoke-invitation.use-case';
+import { Invitation } from '../domain/invitation.entity';
 import { AcceptInvitationDto } from './dto/accept-invitation.dto';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { DeclineInvitationDto } from './dto/decline-invitation.dto';
@@ -71,7 +75,16 @@ export class InvitationsController {
     private readonly revokeInvitation: RevokeInvitationUseCase,
     private readonly acceptInvitation: AcceptInvitationUseCase,
     private readonly declineInvitation: DeclineInvitationUseCase,
+    @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
   ) {}
+
+  private async toView(invitation: Invitation): Promise<InvitationView> {
+    const role = await this.permissionsRepo.findRoleSummary(invitation.roleId);
+    if (!role) {
+      throw new Error(`Invitation ${invitation.id} references an unknown role`);
+    }
+    return toInvitationView(invitation, role);
+  }
 
   @Post('organizations/:id/invitations')
   @RequirePermissions(PERMISSIONS.MEMBERS_INVITE)
@@ -92,9 +105,9 @@ export class InvitationsController {
       callerUserId: user.id,
       organizationId,
       email: dto.email,
-      role: dto.role,
+      roleId: dto.roleId,
     });
-    return toInvitationView(invitation);
+    return this.toView(invitation);
   }
 
   @Get('organizations/:id/invitations')
@@ -110,7 +123,7 @@ export class InvitationsController {
     @Param('id', ParseUUIDPipe) organizationId: string,
   ): Promise<InvitationView[]> {
     const invitations = await this.listPending.execute(user.id, organizationId);
-    return invitations.map(toInvitationView);
+    return Promise.all(invitations.map((invitation) => this.toView(invitation)));
   }
 
   @Get('invitations/mine')
@@ -118,7 +131,7 @@ export class InvitationsController {
   @ApiOkResponse({ type: InvitationModel, isArray: true })
   async mine(@CurrentUser() user: UserPublicProfile): Promise<InvitationView[]> {
     const invitations = await this.listMine.execute(user.email);
-    return invitations.map(toInvitationView);
+    return Promise.all(invitations.map((invitation) => this.toView(invitation)));
   }
 
   @Delete('invitations/:id')

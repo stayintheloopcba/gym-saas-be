@@ -425,59 +425,13 @@
             "description": "Cambia el rol (de sistema) de un miembro. Respeta jerarquía y el invariante de único OWNER.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"role\": \"ADMIN\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Grant/deny member permission",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+              "raw": "{\n  \"roleId\": \"{{roleId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/members/{{userId}}/permissions",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "organizations",
-                "{{orgId}}",
-                "members",
-                "{{userId}}",
-                "permissions"
-              ]
-            },
-            "description": "Override de un permiso a nivel usuario (sin cambiar su rol). Requiere permissions:manage.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"permissionCode\": \"members:invite\",\n  \"value\": true\n}"
             }
-          }
-        },
-        {
-          "name": "Remove member permission override",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/members/{{userId}}/permissions?code=members:invite",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "organizations",
-                "{{orgId}}",
-                "members",
-                "{{userId}}",
-                "permissions?code=members:invite"
-              ]
-            },
-            "description": "Quita un override de permiso del usuario. Requiere permissions:manage."
           }
         }
       ]
@@ -486,34 +440,6 @@
       "name": "Roles",
       "description": "CRUD de roles custom y asignación de permisos (RABAC).",
       "item": [
-        {
-          "name": "Create role",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "organizations",
-                "{{orgId}}",
-                "roles"
-              ]
-            },
-            "description": "Crea un rol custom (hierarchyLevel: 1=SELF, 5=ORGANIZATION). Requiere roles:create.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Editor\",\n  \"description\": \"Custom role\",\n  \"hierarchyLevel\": 1\n}"
-            }
-          }
-        },
         {
           "name": "List roles",
           "request": {
@@ -532,49 +458,61 @@
             },
             "description": "Lista roles de sistema + custom de la organización. Requiere roles:read."
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "Admin Roles",
+      "item": [
         {
-          "name": "Assign custom role to member",
+          "name": "List role catalog",
           "request": {
-            "method": "PUT",
+            "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/members/{{userId}}",
+              "raw": "{{baseUrl}}/admin/roles",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "organizations",
-                "{{orgId}}",
-                "roles",
-                "{{roleId}}",
-                "members",
-                "{{userId}}"
+                "admin",
+                "roles"
               ]
-            },
-            "description": "Asigna un rol custom a un miembro sin cambiar su rol de sistema. Requiere members:update_role."
-          }
+            }
+          },
+          "response": []
         },
         {
-          "name": "Clear member custom role",
+          "name": "Create role",
           "request": {
-            "method": "DELETE",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"billing-manager\",\n  \"name\": \"Billing Manager\",\n  \"description\": \"Manages billing and invoices\",\n  \"hierarchyLevel\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/assignments/{{userId}}",
+              "raw": "{{baseUrl}}/admin/roles",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "organizations",
-                "{{orgId}}",
-                "roles",
-                "assignments",
-                "{{userId}}"
+                "admin",
+                "roles"
               ]
-            },
-            "description": "Quita el rol custom del miembro y conserva su rol de sistema. Requiere members:update_role."
-          }
+            }
+          },
+          "response": []
         },
         {
           "name": "Update role",
@@ -586,24 +524,28 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Billing Manager v2\",\n  \"hierarchyLevel\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}",
+              "raw": "{{baseUrl}}/admin/roles/{{roleId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "organizations",
-                "{{orgId}}",
+                "admin",
                 "roles",
                 "{{roleId}}"
               ]
-            },
-            "description": "Actualiza un rol custom (los de sistema no se editan). Requiere roles:update.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Editor v2\",\n  \"hierarchyLevel\": 5\n}"
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete role",
@@ -611,22 +553,21 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}",
+              "raw": "{{baseUrl}}/admin/roles/{{roleId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "organizations",
-                "{{orgId}}",
+                "admin",
                 "roles",
                 "{{roleId}}"
               ]
-            },
-            "description": "Elimina un rol custom que no esté en uso. Requiere roles:delete."
-          }
+            }
+          },
+          "response": []
         },
         {
-          "name": "Bulk assign permissions to role",
+          "name": "Replace role permissions",
           "request": {
             "method": "PUT",
             "header": [
@@ -635,76 +576,47 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/permissions",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "organizations",
-                "{{orgId}}",
-                "roles",
-                "{{roleId}}",
-                "permissions"
-              ]
-            },
-            "description": "Asigna/deniega varios permisos a un rol. Requiere permissions:manage.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"permissions\": [\n    {\n      \"permissionCode\": \"resources:read\",\n      \"value\": true\n    },\n    {\n      \"permissionCode\": \"resources:update\",\n      \"value\": true\n    }\n  ]\n}"
-            }
-          }
-        },
-        {
-          "name": "Assign permission to role",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+              "raw": "{\n  \"permissionCodes\": [\n    \"resources:read\",\n    \"resources:update\",\n    \"members:read\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
+            },
             "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/permissions",
+              "raw": "{{baseUrl}}/admin/roles/{{roleId}}/permissions",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "organizations",
-                "{{orgId}}",
+                "admin",
                 "roles",
                 "{{roleId}}",
                 "permissions"
               ]
-            },
-            "description": "Asigna/deniega un permiso a un rol. Requiere permissions:manage.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"permissionCode\": \"resources:create\",\n  \"value\": true\n}"
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Remove role permission",
+          "name": "List permission-code catalog",
           "request": {
-            "method": "DELETE",
+            "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/roles/{{roleId}}/permissions?code=resources:create",
+              "raw": "{{baseUrl}}/admin/permissions",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "organizations",
-                "{{orgId}}",
-                "roles",
-                "{{roleId}}",
-                "permissions?code=resources:create"
+                "admin",
+                "permissions"
               ]
-            },
-            "description": "Quita una asignación de permiso del rol. Requiere permissions:manage."
-          }
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -731,46 +643,6 @@
             },
             "description": "Devuelve rol, rol custom, alcance y permisos efectivos del miembro autenticado en la organización activa."
           }
-        },
-        {
-          "name": "List permissions catalog",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/permissions/catalog",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "organizations",
-                "{{orgId}}",
-                "permissions",
-                "catalog"
-              ]
-            },
-            "description": "Lista los permisos disponibles. Requiere permissions:manage o roles:read."
-          }
-        },
-        {
-          "name": "Get permissions matrix",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/organizations/{{orgId}}/permissions/matrix?resource=resources",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "organizations",
-                "{{orgId}}",
-                "permissions",
-                "matrix?resource=resources"
-              ]
-            },
-            "description": "Matriz roles × permisos (filtro opcional ?resource=). Requiere permissions:manage o roles:read."
-          }
         }
       ]
     },
@@ -790,7 +662,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"invitee@example.com\",\n  \"role\": \"MEMBER\"\n}"
+              "raw": "{\n  \"email\": \"invitee@example.com\",\n  \"roleId\": \"{{roleId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/organizations/{{orgId}}/invitations",

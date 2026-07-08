@@ -1,59 +1,36 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
-import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
-import { OwnershipContextService } from '../../permissions/application/ownership-context.service';
 import { Role } from '../../permissions/domain/role.entity';
-import { PERMISSIONS } from '../../permissions/domain/permission-key';
-import { RoleNameConflictError, RoleNotFoundError, SystemRoleImmutableError } from '../domain/role.errors';
+import { RoleNotFoundError } from '../domain/role.errors';
 import { ROLE_REPOSITORY } from '../domain/role.repository';
 import type { RoleRepository } from '../domain/role.repository';
-import { assertWithinCallerHierarchy } from './role-hierarchy.guard-helper';
 
 export interface UpdateRoleCommand {
-  callerUserId: string;
-  organizationId: string;
   roleId: string;
   name?: string;
   description?: string;
   hierarchyLevel?: HierarchyLevel;
 }
 
+/** Platform-admin only. `key` es inmutable: el DTO ni siquiera lo acepta. */
 @Injectable()
 export class UpdateRoleUseCase {
-  constructor(
-    @Inject(ROLE_REPOSITORY) private readonly roles: RoleRepository,
-    private readonly permissions: OrganizationPermissionService,
-    private readonly ownership: OwnershipContextService,
-  ) {}
+  constructor(@Inject(ROLE_REPOSITORY) private readonly roles: RoleRepository) {}
 
   async execute(command: UpdateRoleCommand): Promise<Role> {
-    const { callerUserId, organizationId, roleId, name, description, hierarchyLevel } = command;
-
-    await this.permissions.requirePermission(callerUserId, organizationId, PERMISSIONS.ROLES_UPDATE);
-
-    const role = await this.roles.findById(roleId);
-    if (role?.isSystem) {
-      throw new SystemRoleImmutableError();
-    }
-    if (!role || role.organizationId !== organizationId) {
-      throw new RoleNotFoundError(roleId);
+    const role = await this.roles.findById(command.roleId);
+    if (!role) {
+      throw new RoleNotFoundError(command.roleId);
     }
 
-    if (hierarchyLevel != null) {
-      await assertWithinCallerHierarchy(this.ownership, callerUserId, organizationId, hierarchyLevel);
-      role.hierarchyLevel = hierarchyLevel;
+    if (command.name !== undefined) {
+      role.name = command.name;
     }
-
-    if (name != null && name !== role.name) {
-      const conflict = await this.roles.findActiveByName(organizationId, name);
-      if (conflict && conflict.id !== role.id) {
-        throw new RoleNameConflictError(name);
-      }
-      role.name = name;
+    if (command.description !== undefined) {
+      role.description = command.description;
     }
-
-    if (description !== undefined) {
-      role.description = description;
+    if (command.hierarchyLevel !== undefined) {
+      role.hierarchyLevel = command.hierarchyLevel;
     }
 
     return this.roles.save(role);

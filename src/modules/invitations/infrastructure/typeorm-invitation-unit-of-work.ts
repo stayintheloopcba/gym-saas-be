@@ -15,7 +15,6 @@ export class TypeOrmInvitationUnitOfWork implements InvitationUnitOfWork {
 
   acceptInvitation(membership: Membership, invitation: Invitation): Promise<Membership> {
     return this.dataSource.transaction(async (manager) => {
-      membership.roleId = null;
       const saved = await manager.getRepository(Membership).save(membership);
       await manager.getRepository(Invitation).save(invitation);
       return saved;

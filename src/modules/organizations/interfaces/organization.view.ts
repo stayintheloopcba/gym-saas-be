@@ -1,4 +1,4 @@
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
+import { RoleSummary } from '../../permissions/domain/role-summary';
 import { Organization } from '../domain/organization.entity';
 
 /** Forma pública de una organización en las respuestas HTTP. */
@@ -17,7 +17,7 @@ export interface OrganizationView {
 
 /** La misma vista anotada con el rol del usuario actual (listado "mis orgs"). */
 export interface OrganizationWithRoleView extends OrganizationView {
-  role: MembershipRole;
+  role: RoleSummary;
 }
 
 export function toOrganizationView(organization: Organization): OrganizationView {

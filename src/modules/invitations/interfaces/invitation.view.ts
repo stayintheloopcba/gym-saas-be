@@ -1,5 +1,5 @@
 import { InvitationStatus } from '../../../common/enums/invitation-status.enum';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
+import { RoleSummary } from '../../permissions/domain/role-summary';
 import { Invitation } from '../domain/invitation.entity';
 
 /**
@@ -10,19 +10,19 @@ export interface InvitationView {
   id: string;
   organizationId: string;
   email: string;
-  role: MembershipRole;
+  role: RoleSummary;
   status: InvitationStatus;
   token: string;
   expiresAt: Date;
   createdAt: Date;
 }
 
-export function toInvitationView(invitation: Invitation): InvitationView {
+export function toInvitationView(invitation: Invitation, role: RoleSummary): InvitationView {
   return {
     id: invitation.id,
     organizationId: invitation.organizationId,
     email: invitation.email,
-    role: invitation.role,
+    role,
     status: invitation.status,
     token: invitation.token,
     expiresAt: invitation.expiresAt,

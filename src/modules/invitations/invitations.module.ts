@@ -33,6 +33,6 @@ import { InvitationsController } from './interfaces/invitations.controller';
     AcceptInvitationUseCase,
     DeclineInvitationUseCase,
   ],
-  exports: [ListMyInvitationsUseCase],
+  exports: [ListMyInvitationsUseCase, INVITATION_REPOSITORY],
 })
 export class InvitationsModule {}

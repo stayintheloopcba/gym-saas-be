@@ -1,8 +1,18 @@
-import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { AuthProvider } from '../enums/auth-provider.enum';
 import { InvitationStatus } from '../enums/invitation-status.enum';
-import { MembershipRole } from '../enums/membership-role.enum';
 import { ResourceStatus } from '../../modules/resources/domain/resource-status.enum';
+
+export class RoleSummaryModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ example: 'owner' })
+  key: string;
+
+  @ApiProperty({ example: 'Dueño' })
+  name: string;
+}
 
 export class ErrorResponseModel {
   @ApiProperty({ example: '0194f21c-8814-7f0f-aaba-f4faca4ad9f2' })
@@ -82,8 +92,8 @@ export class OrganizationModel {
 }
 
 export class OrganizationWithRoleModel extends OrganizationModel {
-  @ApiProperty({ enum: MembershipRole })
-  role: MembershipRole;
+  @ApiProperty({ type: RoleSummaryModel })
+  role: RoleSummaryModel;
 }
 
 export class InvitationModel {
@@ -96,8 +106,8 @@ export class InvitationModel {
   @ApiProperty({ format: 'email' })
   email: string;
 
-  @ApiProperty({ enum: MembershipRole })
-  role: MembershipRole;
+  @ApiProperty({ type: RoleSummaryModel })
+  role: RoleSummaryModel;
 
   @ApiProperty({ enum: InvitationStatus })
   status: InvitationStatus;
@@ -116,11 +126,8 @@ export class OrganizationMemberModel {
   @ApiProperty({ format: 'uuid' })
   membershipId: string;
 
-  @ApiProperty({ enum: MembershipRole })
-  role: MembershipRole;
-
-  @ApiProperty({ type: String, format: 'uuid', nullable: true })
-  customRoleId: string | null;
+  @ApiProperty({ type: RoleSummaryModel })
+  role: RoleSummaryModel;
 
   @ApiProperty({ type: UserPublicProfileModel })
   user: UserPublicProfileModel;
@@ -130,11 +137,8 @@ export class MyPermissionsModel {
   @ApiProperty({ format: 'uuid' })
   organizationId: string;
 
-  @ApiProperty({ enum: MembershipRole })
-  role: MembershipRole;
-
-  @ApiProperty({ type: String, format: 'uuid', nullable: true })
-  customRoleId: string | null;
+  @ApiProperty({ type: RoleSummaryModel })
+  role: RoleSummaryModel;
 
   @ApiProperty({
     description: 'Data scope of the current user: SELF=1, ORGANIZATION=5, GLOBAL=10.',
@@ -155,23 +159,17 @@ export class RoleViewModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
 
-  @ApiProperty({ example: 'Billing manager' })
+  @ApiProperty({ example: 'owner', description: 'Stable, immutable kebab-case slug.' })
+  key: string;
+
+  @ApiProperty({ example: 'Dueño' })
   name: string;
 
   @ApiProperty({ type: String, nullable: true, example: 'Manages billing and invoices' })
   description: string | null;
 
-  @ApiProperty({ description: 'System roles are read-only and cannot be edited or deleted.' })
-  isSystem: boolean;
-
-  @ApiProperty({ enum: MembershipRole, nullable: true, description: 'Set only for system roles.' })
-  systemKey: MembershipRole | null;
-
   @ApiProperty({ description: 'Data scope of the role: SELF=1, ORGANIZATION=5, GLOBAL=10.', example: 5 })
   hierarchyLevel: number;
-
-  @ApiProperty({ type: String, format: 'uuid', nullable: true, description: 'Null for system roles (global).' })
-  organizationId: string | null;
 
   @ApiProperty({ format: 'date-time' })
   createdAt: Date;
@@ -186,33 +184,6 @@ export class PermissionInfoModel {
 
   @ApiProperty({ type: String, nullable: true, example: 'Allows editing existing resources' })
   description: string | null;
-}
-
-export class PermissionAssignmentViewModel {
-  @ApiProperty({ example: 'resources:update' })
-  permissionCode: string;
-
-  @ApiProperty({ description: 'true = allow, false = explicit deny.' })
-  value: boolean;
-}
-
-@ApiExtraModels(PermissionAssignmentViewModel)
-export class PermissionMatrixModel {
-  @ApiProperty({ type: RoleViewModel, isArray: true })
-  roles: RoleViewModel[];
-
-  @ApiProperty({ type: PermissionInfoModel, isArray: true })
-  permissions: PermissionInfoModel[];
-
-  @ApiProperty({
-    type: 'object',
-    description: 'Per role id (key): the list of its permission assignments.',
-    additionalProperties: {
-      type: 'array',
-      items: { $ref: getSchemaPath(PermissionAssignmentViewModel) },
-    },
-  })
-  assignments: Record<string, PermissionAssignmentViewModel[]>;
 }
 
 export class OnboardingStatusModel {

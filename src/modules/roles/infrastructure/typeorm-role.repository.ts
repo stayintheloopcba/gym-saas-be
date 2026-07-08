@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Role } from '../../permissions/domain/role.entity';
 import { RoleRepository } from '../domain/role.repository';
 
@@ -12,15 +12,12 @@ export class TypeOrmRoleRepository implements RoleRepository {
     return this.repo.findOne({ where: { id } });
   }
 
-  findActiveByName(organizationId: string, name: string): Promise<Role | null> {
-    return this.repo.findOne({ where: { organizationId, name } });
+  findByKey(key: string): Promise<Role | null> {
+    return this.repo.findOne({ where: { key } });
   }
 
-  listForOrganization(organizationId: string): Promise<Role[]> {
-    return this.repo.find({
-      where: [{ organizationId: IsNull() }, { organizationId }],
-      order: { hierarchyLevel: 'DESC', name: 'ASC' },
-    });
+  listAll(): Promise<Role[]> {
+    return this.repo.find({ order: { hierarchyLevel: 'DESC', name: 'ASC' } });
   }
 
   save(role: Role): Promise<Role> {

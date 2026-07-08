@@ -1,163 +1,198 @@
 import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
-import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
-import { OwnershipContextService } from '../../permissions/application/ownership-context.service';
-import { PermissionDeniedError } from '../../permissions/domain/permission.errors';
+import type { InvitationRepository } from '../../invitations/domain/invitation.repository';
+import type { MembershipRepository } from '../../memberships/domain/membership.repository';
+import type { PermissionCatalogRepository } from '../../permissions/domain/permission-catalog.repository';
+import { UnknownPermissionError } from '../../permissions/domain/permission.errors';
+import type { RolePermissionRepository } from '../../permissions/domain/role-permission.repository';
 import { Role } from '../../permissions/domain/role.entity';
-import { MembershipRepository } from '../../memberships/domain/membership.repository';
 import {
-  RoleHierarchyExceededError,
+  OwnerRoleProtectedError,
   RoleInUseError,
-  RoleNameConflictError,
+  RoleKeyConflictError,
   RoleNotFoundError,
-  SystemRoleImmutableError,
 } from '../domain/role.errors';
-import { RoleRepository } from '../domain/role.repository';
+import type { RoleRepository } from '../domain/role.repository';
 import { CreateRoleUseCase } from './create-role.use-case';
 import { DeleteRoleUseCase } from './delete-role.use-case';
+import { ReplaceRolePermissionsUseCase } from './replace-role-permissions.use-case';
 import { UpdateRoleUseCase } from './update-role.use-case';
 
-const ORG = 'org-1';
-const CALLER = 'user-1';
-
-const customRole = (over: Partial<Role> = {}): Role =>
+const role = (overrides: Partial<Role> = {}): Role =>
   Object.assign(new Role(), {
     id: 'role-1',
-    organizationId: ORG,
-    name: 'Editor',
-    isSystem: false,
-    systemKey: null,
-    hierarchyLevel: HierarchyLevel.SELF,
-    ...over,
+    key: 'billing-manager',
+    name: 'Billing manager',
+    hierarchyLevel: 5,
+    ...overrides,
   });
 
-describe('Role use cases', () => {
+describe('CreateRoleUseCase', () => {
   let roles: jest.Mocked<RoleRepository>;
-  let permissions: { requirePermission: jest.Mock };
-  let ownership: { build: jest.Mock };
-  let memberships: { countByRole: jest.Mock };
+  let useCase: CreateRoleUseCase;
 
   beforeEach(() => {
     roles = {
       findById: jest.fn(),
-      findActiveByName: jest.fn().mockResolvedValue(null),
-      listForOrganization: jest.fn(),
-      save: jest.fn((role) => Promise.resolve(role)),
+      findByKey: jest.fn(),
+      listAll: jest.fn(),
+      save: jest.fn((r: Role) => Promise.resolve(r)),
       softDelete: jest.fn(),
     };
-    permissions = { requirePermission: jest.fn() };
-    ownership = { build: jest.fn().mockResolvedValue({ userId: CALLER, organizationId: ORG, hierarchyLevel: 5 }) };
-    memberships = { countByRole: jest.fn().mockResolvedValue(0) };
+    useCase = new CreateRoleUseCase(roles);
   });
 
-  const createUseCase = () =>
-    new CreateRoleUseCase(
-      roles,
-      permissions as unknown as OrganizationPermissionService,
-      ownership as unknown as OwnershipContextService,
-    );
+  it('creates a role with a unique key', async () => {
+    roles.findByKey.mockResolvedValue(null);
 
-  it('creates a custom role within the caller hierarchy', async () => {
-    const role = await createUseCase().execute({
-      callerUserId: CALLER,
-      organizationId: ORG,
-      name: 'Editor',
-      hierarchyLevel: HierarchyLevel.SELF,
+    const result = await useCase.execute({
+      key: 'billing-manager',
+      name: 'Billing manager',
+      hierarchyLevel: HierarchyLevel.ORGANIZATION,
     });
 
-    expect(role.isSystem).toBe(false);
-    expect(role.organizationId).toBe(ORG);
+    expect(result.key).toBe('billing-manager');
     expect(roles.save).toHaveBeenCalled();
   });
 
-  it('rejects a duplicate role name', async () => {
-    roles.findActiveByName.mockResolvedValue(customRole());
+  it('rejects a duplicate key', async () => {
+    roles.findByKey.mockResolvedValue(role());
 
     await expect(
-      createUseCase().execute({
-        callerUserId: CALLER,
-        organizationId: ORG,
-        name: 'Editor',
-        hierarchyLevel: HierarchyLevel.SELF,
-      }),
-    ).rejects.toBeInstanceOf(RoleNameConflictError);
+      useCase.execute({ key: 'billing-manager', name: 'Billing manager', hierarchyLevel: HierarchyLevel.SELF }),
+    ).rejects.toBeInstanceOf(RoleKeyConflictError);
+    expect(roles.save).not.toHaveBeenCalled();
+  });
+});
+
+describe('UpdateRoleUseCase', () => {
+  let roles: jest.Mocked<RoleRepository>;
+  let useCase: UpdateRoleUseCase;
+
+  beforeEach(() => {
+    roles = {
+      findById: jest.fn(),
+      findByKey: jest.fn(),
+      listAll: jest.fn(),
+      save: jest.fn((r: Role) => Promise.resolve(r)),
+      softDelete: jest.fn(),
+    };
+    useCase = new UpdateRoleUseCase(roles);
   });
 
-  it('rejects creating a role above the caller hierarchy', async () => {
-    ownership.build.mockResolvedValue({ userId: CALLER, organizationId: ORG, hierarchyLevel: HierarchyLevel.SELF });
+  it('updates name, description and hierarchyLevel, never key', async () => {
+    roles.findById.mockResolvedValue(role());
 
-    await expect(
-      createUseCase().execute({
-        callerUserId: CALLER,
-        organizationId: ORG,
-        name: 'Admin-ish',
-        hierarchyLevel: HierarchyLevel.ORGANIZATION,
-      }),
-    ).rejects.toBeInstanceOf(RoleHierarchyExceededError);
+    const result = await useCase.execute({ roleId: 'role-1', name: 'New name', hierarchyLevel: HierarchyLevel.SELF });
+
+    expect(result.name).toBe('New name');
+    expect(result.hierarchyLevel).toBe(HierarchyLevel.SELF);
+    expect(result.key).toBe('billing-manager');
   });
 
-  it('propagates a permission denial on create', async () => {
-    permissions.requirePermission.mockRejectedValue(new PermissionDeniedError());
+  it('rejects an unknown role', async () => {
+    roles.findById.mockResolvedValue(null);
 
-    await expect(
-      createUseCase().execute({
-        callerUserId: CALLER,
-        organizationId: ORG,
-        name: 'Editor',
-        hierarchyLevel: HierarchyLevel.SELF,
-      }),
-    ).rejects.toBeInstanceOf(PermissionDeniedError);
+    await expect(useCase.execute({ roleId: 'ghost' })).rejects.toBeInstanceOf(RoleNotFoundError);
   });
+});
 
-  const updateUseCase = () =>
-    new UpdateRoleUseCase(
-      roles,
-      permissions as unknown as OrganizationPermissionService,
-      ownership as unknown as OwnershipContextService,
-    );
+describe('DeleteRoleUseCase', () => {
+  let roles: jest.Mocked<RoleRepository>;
+  let memberships: { countByRole: jest.Mock };
+  let invitations: { countPendingByRole: jest.Mock };
+  let useCase: DeleteRoleUseCase;
 
-  it('refuses to update a system role', async () => {
-    roles.findById.mockResolvedValue(customRole({ isSystem: true, organizationId: null }));
-
-    await expect(
-      updateUseCase().execute({ callerUserId: CALLER, organizationId: ORG, roleId: 'role-1', name: 'x' }),
-    ).rejects.toBeInstanceOf(SystemRoleImmutableError);
-  });
-
-  it('treats a role from another organization as not found', async () => {
-    roles.findById.mockResolvedValue(customRole({ organizationId: 'other-org' }));
-
-    await expect(
-      updateUseCase().execute({ callerUserId: CALLER, organizationId: ORG, roleId: 'role-1', name: 'x' }),
-    ).rejects.toBeInstanceOf(RoleNotFoundError);
-  });
-
-  const deleteUseCase = () =>
-    new DeleteRoleUseCase(
+  beforeEach(() => {
+    roles = {
+      findById: jest.fn(),
+      findByKey: jest.fn(),
+      listAll: jest.fn(),
+      save: jest.fn(),
+      softDelete: jest.fn(),
+    };
+    memberships = { countByRole: jest.fn().mockResolvedValue(0) };
+    invitations = { countPendingByRole: jest.fn().mockResolvedValue(0) };
+    useCase = new DeleteRoleUseCase(
       roles,
       memberships as unknown as MembershipRepository,
-      permissions as unknown as OrganizationPermissionService,
+      invitations as unknown as InvitationRepository,
     );
-
-  it('refuses to delete a role in use', async () => {
-    roles.findById.mockResolvedValue(customRole());
-    memberships.countByRole.mockResolvedValue(2);
-
-    await expect(deleteUseCase().execute(CALLER, ORG, 'role-1')).rejects.toBeInstanceOf(RoleInUseError);
-    expect(roles.softDelete).not.toHaveBeenCalled();
   });
 
-  it('deletes a custom role that is not in use', async () => {
-    roles.findById.mockResolvedValue(customRole());
-    memberships.countByRole.mockResolvedValue(0);
+  it('deletes a role with no members or pending invitations', async () => {
+    roles.findById.mockResolvedValue(role());
 
-    await deleteUseCase().execute(CALLER, ORG, 'role-1');
+    await useCase.execute('role-1');
 
     expect(roles.softDelete).toHaveBeenCalledWith('role-1');
   });
 
-  it('refuses to delete a system role', async () => {
-    roles.findById.mockResolvedValue(customRole({ isSystem: true, organizationId: null }));
+  it('rejects deleting the owner role', async () => {
+    roles.findById.mockResolvedValue(role({ key: 'owner' }));
 
-    await expect(deleteUseCase().execute(CALLER, ORG, 'role-1')).rejects.toBeInstanceOf(SystemRoleImmutableError);
+    await expect(useCase.execute('role-1')).rejects.toBeInstanceOf(OwnerRoleProtectedError);
+    expect(roles.softDelete).not.toHaveBeenCalled();
+  });
+
+  it('rejects deleting a role in use by a membership', async () => {
+    roles.findById.mockResolvedValue(role());
+    memberships.countByRole.mockResolvedValue(1);
+
+    await expect(useCase.execute('role-1')).rejects.toBeInstanceOf(RoleInUseError);
+  });
+
+  it('rejects deleting a role in use by a pending invitation', async () => {
+    roles.findById.mockResolvedValue(role());
+    invitations.countPendingByRole.mockResolvedValue(1);
+
+    await expect(useCase.execute('role-1')).rejects.toBeInstanceOf(RoleInUseError);
+  });
+});
+
+describe('ReplaceRolePermissionsUseCase', () => {
+  let roles: jest.Mocked<RoleRepository>;
+  let rolePermissions: { replacePermissions: jest.Mock };
+  let catalog: { existsActive: jest.Mock };
+  let useCase: ReplaceRolePermissionsUseCase;
+
+  beforeEach(() => {
+    roles = {
+      findById: jest.fn(),
+      findByKey: jest.fn(),
+      listAll: jest.fn(),
+      save: jest.fn(),
+      softDelete: jest.fn(),
+    };
+    rolePermissions = { replacePermissions: jest.fn() };
+    catalog = { existsActive: jest.fn().mockResolvedValue(true) };
+    useCase = new ReplaceRolePermissionsUseCase(
+      roles,
+      rolePermissions as unknown as RolePermissionRepository,
+      catalog as unknown as PermissionCatalogRepository,
+    );
+  });
+
+  it('replaces the full permission set of a role', async () => {
+    roles.findById.mockResolvedValue(role());
+
+    await useCase.execute({ roleId: 'role-1', permissionCodes: ['members:read', 'members:invite'] });
+
+    expect(rolePermissions.replacePermissions).toHaveBeenCalledWith('role-1', ['members:read', 'members:invite']);
+  });
+
+  it('rejects an unknown permission code', async () => {
+    roles.findById.mockResolvedValue(role());
+    catalog.existsActive.mockResolvedValue(false);
+
+    await expect(useCase.execute({ roleId: 'role-1', permissionCodes: ['nonsense:code'] })).rejects.toBeInstanceOf(
+      UnknownPermissionError,
+    );
+    expect(rolePermissions.replacePermissions).not.toHaveBeenCalled();
+  });
+
+  it('rejects an unknown role', async () => {
+    roles.findById.mockResolvedValue(null);
+
+    await expect(useCase.execute({ roleId: 'ghost', permissionCodes: [] })).rejects.toBeInstanceOf(RoleNotFoundError);
   });
 });

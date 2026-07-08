@@ -2,33 +2,36 @@ import { randomBytes } from 'crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InvitationStatus } from '../../../common/enums/invitation-status.enum';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
 import { parseDurationMs } from '../../../common/lib/duration';
 import { MEMBERSHIP_REPOSITORY } from '../../memberships/domain/membership.repository';
 import type { MembershipRepository } from '../../memberships/domain/membership.repository';
 import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
+import { PERMISSION_REPOSITORY } from '../../permissions/domain/permission.repository';
+import type { PermissionRepository } from '../../permissions/domain/permission.repository';
 import { Email } from '../../users/domain/email.vo';
 import { FindUserByEmailUseCase } from '../../users/application/find-user.use-cases';
 import { Invitation } from '../domain/invitation.entity';
-import { AlreadyMemberError } from '../domain/invitation.errors';
+import { AlreadyMemberError, OwnerRoleNotInvitableError, UnknownRoleError } from '../domain/invitation.errors';
 import { INVITATION_REPOSITORY } from '../domain/invitation.repository';
 import type { InvitationRepository } from '../domain/invitation.repository';
+
+const OWNER_ROLE_KEY = 'owner';
+const DEFAULT_TTL = '7d';
 
 export interface CreateInvitationCommand {
   callerUserId: string;
   organizationId: string;
   email: string;
-  role: MembershipRole;
+  roleId: string;
 }
 
-const DEFAULT_TTL = '7d';
-
 /**
- * Crea una invitación a una organización. Requiere que el llamador sea
- * `OWNER`/`ADMIN`. Rechaza invitar a un email que ya es miembro activo
- * (`AlreadyMemberError`) y es idempotente: si ya hay una invitación `PENDING`
- * para ese email en la org, la devuelve en vez de duplicarla.
+ * Crea una invitación a una organización. Requiere el permiso `members:invite`.
+ * Rechaza invitar a un email que ya es miembro activo (`AlreadyMemberError`),
+ * un `roleId` desconocido (`UnknownRoleError`) o el rol `owner`
+ * (`OwnerRoleNotInvitableError`). Es idempotente: si ya hay una invitación
+ * `PENDING` para ese email en la org, la devuelve en vez de duplicarla.
  */
 @Injectable()
 export class CreateInvitationUseCase {
@@ -37,6 +40,7 @@ export class CreateInvitationUseCase {
   constructor(
     @Inject(INVITATION_REPOSITORY) private readonly invitations: InvitationRepository,
     @Inject(MEMBERSHIP_REPOSITORY) private readonly memberships: MembershipRepository,
+    @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
     private readonly findUserByEmail: FindUserByEmailUseCase,
     private readonly permissions: OrganizationPermissionService,
     config: ConfigService,
@@ -45,10 +49,18 @@ export class CreateInvitationUseCase {
   }
 
   async execute(command: CreateInvitationCommand): Promise<Invitation> {
-    const { callerUserId, organizationId, role } = command;
+    const { callerUserId, organizationId, roleId } = command;
     const email = Email.normalize(command.email);
 
     await this.permissions.requirePermission(callerUserId, organizationId, PERMISSIONS.MEMBERS_INVITE);
+
+    const role = await this.permissionsRepo.findRoleSummary(roleId);
+    if (!role) {
+      throw new UnknownRoleError(roleId);
+    }
+    if (role.key === OWNER_ROLE_KEY) {
+      throw new OwnerRoleNotInvitableError();
+    }
 
     // Si el email pertenece a un usuario que ya es miembro activo, no se invita.
     const invitedUser = await this.findUserByEmail.execute(email);
@@ -68,7 +80,7 @@ export class CreateInvitationUseCase {
     const invitation = new Invitation();
     invitation.organizationId = organizationId;
     invitation.email = email;
-    invitation.role = role;
+    invitation.roleId = role.id;
     invitation.token = randomBytes(32).toString('hex');
     invitation.status = InvitationStatus.PENDING;
     invitation.expiresAt = new Date(Date.now() + this.ttlMs);

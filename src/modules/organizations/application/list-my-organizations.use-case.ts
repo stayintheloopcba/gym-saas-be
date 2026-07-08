@@ -1,15 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
 import { MEMBERSHIP_REPOSITORY } from '../../memberships/domain/membership.repository';
 import type { MembershipRepository } from '../../memberships/domain/membership.repository';
+import { PERMISSION_REPOSITORY } from '../../permissions/domain/permission.repository';
+import type { PermissionRepository } from '../../permissions/domain/permission.repository';
+import { RoleSummary } from '../../permissions/domain/role-summary';
 import { Organization } from '../domain/organization.entity';
 import { ORGANIZATION_REPOSITORY } from '../domain/organization.repository';
 import type { OrganizationRepository } from '../domain/organization.repository';
 
-/** Una organización del usuario junto con el rol que tiene en ella. */
+/** Una organización del usuario junto con su rol del catálogo en ella. */
 export interface MyOrganization {
   organization: Organization;
-  role: MembershipRole;
+  role: RoleSummary;
 }
 
 /**
@@ -21,6 +23,7 @@ export class ListMyOrganizationsUseCase {
   constructor(
     @Inject(ORGANIZATION_REPOSITORY) private readonly organizations: OrganizationRepository,
     @Inject(MEMBERSHIP_REPOSITORY) private readonly memberships: MembershipRepository,
+    @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
   ) {}
 
   async execute(callerUserId: string): Promise<MyOrganization[]> {
@@ -28,9 +31,12 @@ export class ListMyOrganizationsUseCase {
 
     const result: MyOrganization[] = [];
     for (const membership of memberships) {
-      const organization = await this.organizations.findById(membership.organizationId);
-      if (organization) {
-        result.push({ organization, role: membership.role });
+      const [organization, role] = await Promise.all([
+        this.organizations.findById(membership.organizationId),
+        this.permissionsRepo.findRoleSummary(membership.roleId),
+      ]);
+      if (organization && role) {
+        result.push({ organization, role });
       }
     }
     return result;

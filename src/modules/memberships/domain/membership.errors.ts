@@ -20,21 +20,12 @@ export class MembershipNotFoundError extends DomainError {
   }
 }
 
-/** No se puede remover/degradar al único OWNER de una organización. */
+/** No se puede remover/degradar al único `owner` de una organización. */
 export class SoleOwnerError extends DomainError {
   readonly status = 409;
 
   constructor() {
     super('The sole owner of an organization cannot be removed or demoted');
-  }
-}
-
-/** El rol del usuario no alcanza el mínimo requerido para la operación. */
-export class InsufficientRoleError extends DomainError {
-  readonly status = 403;
-
-  constructor() {
-    super('Your role is not high enough to perform this operation on this member');
   }
 }
 
@@ -44,5 +35,23 @@ export class CannotChangeOwnRoleError extends DomainError {
 
   constructor() {
     super('You cannot change your own role');
+  }
+}
+
+/** El `roleId` no corresponde a ningún rol del catálogo. */
+export class UnknownRoleError extends DomainError {
+  readonly status = 404;
+
+  constructor(roleId: string) {
+    super(`Unknown role: ${roleId}`);
+  }
+}
+
+/** El rol `owner` solo se otorga automáticamente al crear la organización. */
+export class OwnerRoleNotAssignableError extends DomainError {
+  readonly status = 409;
+
+  constructor() {
+    super('The owner role cannot be assigned through this operation');
   }
 }

@@ -13,6 +13,7 @@ import { InvitationsModule } from './modules/invitations/invitations.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
+import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -32,6 +33,7 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     AuthModule,
     PermissionsModule,
+    PlatformAdminModule,
     ResourcesModule,
     MembershipsModule,
     RolesModule,

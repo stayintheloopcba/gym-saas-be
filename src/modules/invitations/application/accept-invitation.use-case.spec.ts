@@ -1,5 +1,4 @@
 import { InvitationStatus } from '../../../common/enums/invitation-status.enum';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
 import { Membership } from '../../memberships/domain/membership.entity';
 import { MembershipRepository } from '../../memberships/domain/membership.repository';
 import { Invitation } from '../domain/invitation.entity';
@@ -13,12 +12,14 @@ import { InvitationRepository } from '../domain/invitation.repository';
 import { AcceptInvitationUseCase } from './accept-invitation.use-case';
 import { InvitationUnitOfWork } from './invitation-unit-of-work.port';
 
+const ROLE_ID = 'role-instructor';
+
 const invitation = (overrides: Partial<Invitation> = {}): Invitation =>
   Object.assign(new Invitation(), {
     id: 'inv-1',
     organizationId: 'org-1',
     email: 'bob@example.com',
-    role: MembershipRole.MEMBER,
+    roleId: ROLE_ID,
     token: 'tok',
     status: InvitationStatus.PENDING,
     expiresAt: new Date(Date.now() + 60_000),
@@ -38,13 +39,14 @@ describe('AcceptInvitationUseCase', () => {
       findPendingByOrgAndEmail: jest.fn(),
       findPendingByOrg: jest.fn(),
       findPendingByEmail: jest.fn(),
+      countPendingByRole: jest.fn(),
       save: jest.fn(),
     };
     memberships = {
       findByUserAndOrg: jest.fn(),
       findByUser: jest.fn(),
       findByOrg: jest.fn(),
-      countOwners: jest.fn(),
+      countByRoleInOrg: jest.fn(),
       countByRole: jest.fn(),
       save: jest.fn(),
       softDelete: jest.fn(),
@@ -55,16 +57,16 @@ describe('AcceptInvitationUseCase', () => {
 
   const command = { callerUserId: 'u-bob', callerEmail: 'bob@example.com', token: 'tok' };
 
-  it('creates the membership and marks the invitation ACCEPTED on the happy path', async () => {
+  it('creates the membership with the invitation roleId and marks it ACCEPTED on the happy path', async () => {
     invitations.findByToken.mockResolvedValue(invitation());
     memberships.findByUserAndOrg.mockResolvedValue(null);
 
     const membership = await useCase.execute(command);
 
     expect(membership.organizationId).toBe('org-1');
-    expect(membership.role).toBe(MembershipRole.MEMBER);
+    expect(membership.roleId).toBe(ROLE_ID);
     expect(unitOfWork.acceptInvitation).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: 'u-bob', organizationId: 'org-1' }),
+      expect.objectContaining({ userId: 'u-bob', organizationId: 'org-1', roleId: ROLE_ID }),
       expect.objectContaining({ status: InvitationStatus.ACCEPTED }),
     );
   });

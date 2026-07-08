@@ -2,8 +2,9 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { HierarchyLevel } from '../../../../common/enums/hierarchy-level.enum';
 
-const ASSIGNABLE_LEVELS = [HierarchyLevel.SELF, HierarchyLevel.ORGANIZATION];
+const ASSIGNABLE_HIERARCHY_LEVELS = [HierarchyLevel.SELF, HierarchyLevel.ORGANIZATION];
 
+/** `key` no es editable: no forma parte de este DTO a propósito. */
 export class UpdateRoleDto {
   @ApiPropertyOptional({ minLength: 1, maxLength: 100 })
   @IsOptional()
@@ -12,14 +13,14 @@ export class UpdateRoleDto {
   @MaxLength(100)
   name?: string;
 
-  @ApiPropertyOptional({ maxLength: 255, nullable: true })
+  @ApiPropertyOptional({ maxLength: 255 })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   description?: string;
 
-  @ApiPropertyOptional({ enum: ASSIGNABLE_LEVELS, description: '1=SELF, 5=ORGANIZATION' })
+  @ApiPropertyOptional({ enum: ASSIGNABLE_HIERARCHY_LEVELS, description: '1=SELF, 5=ORGANIZATION' })
   @IsOptional()
-  @IsIn(ASSIGNABLE_LEVELS)
+  @IsIn(ASSIGNABLE_HIERARCHY_LEVELS)
   hierarchyLevel?: HierarchyLevel;
 }

@@ -8,8 +8,6 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Post,
-  Query,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -33,13 +31,11 @@ import { ErrorResponseModel, OrganizationMemberModel } from '../../../common/ope
 import { ACCESS_TOKEN_SECURITY, ACTIVE_ORG_SECURITY } from '../../../config/openapi.config';
 import { CurrentUser } from '../../auth/interfaces/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/interfaces/jwt-auth.guard';
-import { PermissionAssignmentService } from '../../permissions/application/permission-assignment.service';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
 import type { UserPublicProfile } from '../../users/application/user-public-profile';
 import { ChangeMemberRoleUseCase } from '../application/change-member-role.use-case';
 import { ListOrganizationMembersUseCase, OrganizationMember } from '../application/list-organization-members.use-case';
 import { RemoveMemberUseCase } from '../application/remove-member.use-case';
-import { AssignMemberPermissionDto } from './dto/assign-member-permission.dto';
 import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
 
 /**
@@ -59,7 +55,6 @@ export class MembersController {
     private readonly listMembers: ListOrganizationMembersUseCase,
     private readonly removeMember: RemoveMemberUseCase,
     private readonly changeMemberRole: ChangeMemberRoleUseCase,
-    private readonly permissionAssignments: PermissionAssignmentService,
   ) {}
 
   @Get()
@@ -95,7 +90,7 @@ export class MembersController {
       callerUserId: user.id,
       organizationId,
       targetUserId,
-      role: dto.role,
+      roleId: dto.roleId,
     });
   }
 
@@ -114,40 +109,5 @@ export class MembersController {
     @Param('userId', ParseUUIDPipe) targetUserId: string,
   ): Promise<void> {
     await this.removeMember.execute({ callerUserId: user.id, organizationId, targetUserId });
-  }
-
-  @Post(':userId/permissions')
-  @RequirePermissions(PERMISSIONS.PERMISSIONS_MANAGE)
-  @ApiOperation({ summary: 'Grant or deny a permission to a member (overrides their role)' })
-  @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiParam({ name: 'userId', format: 'uuid' })
-  @ApiBody({ type: AssignMemberPermissionDto })
-  @ApiNoContentResponse()
-  @ApiForbiddenResponse({ type: ErrorResponseModel })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async assignPermission(
-    @CurrentUser() user: UserPublicProfile,
-    @Param('id', ParseUUIDPipe) organizationId: string,
-    @Param('userId', ParseUUIDPipe) targetUserId: string,
-    @Body() dto: AssignMemberPermissionDto,
-  ): Promise<void> {
-    await this.permissionAssignments.assignToUser(user.id, organizationId, targetUserId, dto);
-  }
-
-  @Delete(':userId/permissions')
-  @RequirePermissions(PERMISSIONS.PERMISSIONS_MANAGE)
-  @ApiOperation({ summary: 'Remove a permission override from a member' })
-  @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiParam({ name: 'userId', format: 'uuid' })
-  @ApiNoContentResponse()
-  @ApiForbiddenResponse({ type: ErrorResponseModel })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async unassignPermission(
-    @CurrentUser() user: UserPublicProfile,
-    @Param('id', ParseUUIDPipe) organizationId: string,
-    @Param('userId', ParseUUIDPipe) targetUserId: string,
-    @Query('code') permissionCode: string,
-  ): Promise<void> {
-    await this.permissionAssignments.unassignFromUser(user.id, organizationId, targetUserId, permissionCode);
   }
 }

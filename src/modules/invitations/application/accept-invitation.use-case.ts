@@ -58,7 +58,7 @@ export class AcceptInvitationUseCase {
     const membership = new Membership();
     membership.userId = command.callerUserId;
     membership.organizationId = invitation.organizationId;
-    membership.role = invitation.role;
+    membership.roleId = invitation.roleId;
 
     invitation.status = InvitationStatus.ACCEPTED;
 

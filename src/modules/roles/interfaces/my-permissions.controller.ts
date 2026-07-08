@@ -43,7 +43,6 @@ export class MyPermissionsController {
     return {
       organizationId,
       role: effective.role,
-      customRoleId: effective.customRoleId,
       hierarchyLevel: effective.hierarchyLevel,
       permissions: [...effective.permissions],
     };

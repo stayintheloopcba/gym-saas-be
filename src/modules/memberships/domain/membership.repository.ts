@@ -14,15 +14,15 @@ export const MEMBERSHIP_REPOSITORY = Symbol('MEMBERSHIP_REPOSITORY');
  *
  * Todas las búsquedas excluyen registros soft-deleted. `save` acepta un
  * `EntityManager` opcional para participar en una transacción (p. ej. la creación
- * atómica de org + membresía OWNER) sin acoplar la aplicación a TypeORM.
+ * atómica de org + membresía owner) sin acoplar la aplicación a TypeORM.
  */
 export interface MembershipRepository {
   findByUserAndOrg(userId: string, organizationId: string): Promise<Membership | null>;
   findByUser(userId: string): Promise<Membership[]>;
   findByOrg(organizationId: string): Promise<Membership[]>;
-  /** Cantidad de membresías OWNER activas de una organización. */
-  countOwners(organizationId: string): Promise<number>;
-  /** Cantidad de membresías activas que usan un rol custom dado (para "rol en uso"). */
+  /** Cantidad de membresías activas de una organización que tienen un rol dado (p. ej. contar owners). */
+  countByRoleInOrg(organizationId: string, roleId: string): Promise<number>;
+  /** Cantidad de membresías activas (en cualquier organización) que usan un rol dado (para "rol en uso"). */
   countByRole(roleId: string): Promise<number>;
   save(membership: Membership, manager?: EntityManager): Promise<Membership>;
   softDelete(id: string): Promise<void>;

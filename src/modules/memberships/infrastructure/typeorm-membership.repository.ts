@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { MembershipRole } from '../../../common/enums/membership-role.enum';
 import { Membership } from '../domain/membership.entity';
 import { MembershipRepository } from '../domain/membership.repository';
 
@@ -28,8 +27,8 @@ export class TypeOrmMembershipRepository implements MembershipRepository {
     return this.repo.find({ where: { organizationId } });
   }
 
-  countOwners(organizationId: string): Promise<number> {
-    return this.repo.count({ where: { organizationId, role: MembershipRole.OWNER } });
+  countByRoleInOrg(organizationId: string, roleId: string): Promise<number> {
+    return this.repo.count({ where: { organizationId, roleId } });
   }
 
   countByRole(roleId: string): Promise<number> {

@@ -35,6 +35,10 @@ export class TypeOrmInvitationRepository implements InvitationRepository {
     return this.repo.find({ where: { email, status: InvitationStatus.PENDING } });
   }
 
+  countPendingByRole(roleId: string): Promise<number> {
+    return this.repo.count({ where: { roleId, status: InvitationStatus.PENDING } });
+  }
+
   save(invitation: Invitation, manager?: EntityManager): Promise<Invitation> {
     const repo = manager ? manager.getRepository(Invitation) : this.repo;
     return repo.save(invitation);

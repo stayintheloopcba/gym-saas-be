@@ -23,5 +23,7 @@ export interface InvitationRepository {
   findPendingByOrgAndEmail(organizationId: string, email: string): Promise<Invitation | null>;
   findPendingByOrg(organizationId: string): Promise<Invitation[]>;
   findPendingByEmail(email: string): Promise<Invitation[]>;
+  /** Cantidad de invitaciones `PENDING` que apuntan a un rol dado (para "rol en uso"). */
+  countPendingByRole(roleId: string): Promise<number>;
   save(invitation: Invitation, manager?: EntityManager): Promise<Invitation>;
 }

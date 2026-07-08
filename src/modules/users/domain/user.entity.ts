@@ -38,4 +38,8 @@ export class User extends BaseEntity {
   /** URL del avatar del usuario (almacenado en MinIO, Fase B). `null` = iniciales. */
   @Column({ name: 'avatar_url', type: 'varchar', length: 1024, nullable: true })
   public avatarUrl: string | null;
+
+  /** SUPER_ADMIN: acceso a `/admin/*`, desacoplado de memberships/organizaciones. */
+  @Column({ name: 'is_platform_admin', type: 'boolean', default: false })
+  public isPlatformAdmin: boolean;
 }
