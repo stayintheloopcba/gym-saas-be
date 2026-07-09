@@ -5,7 +5,7 @@ import { DomainError } from './domain-error';
 /**
  * Traduce cualquier `DomainError` a una `HttpException` con el `status` que la
  * propia subclase declara. Centraliza la traducción dominio → HTTP para los
- * módulos de negocio (organizations, memberships, invitations); cualquier otro
+ * módulos de negocio (organizations, memberships, roles); cualquier otro
  * error se delega al filtro global.
  *
  * (El módulo `auth` usa su propio `DomainExceptionFilter` con `instanceof`

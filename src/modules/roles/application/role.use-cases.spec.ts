@@ -1,5 +1,4 @@
 import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
-import type { InvitationRepository } from '../../invitations/domain/invitation.repository';
 import type { MembershipRepository } from '../../memberships/domain/membership.repository';
 import type { PermissionCatalogRepository } from '../../permissions/domain/permission-catalog.repository';
 import { UnknownPermissionError } from '../../permissions/domain/permission.errors';
@@ -99,7 +98,6 @@ describe('UpdateRoleUseCase', () => {
 describe('DeleteRoleUseCase', () => {
   let roles: jest.Mocked<RoleRepository>;
   let memberships: { countByRole: jest.Mock };
-  let invitations: { countPendingByRole: jest.Mock };
   let useCase: DeleteRoleUseCase;
 
   beforeEach(() => {
@@ -111,15 +109,10 @@ describe('DeleteRoleUseCase', () => {
       softDelete: jest.fn(),
     };
     memberships = { countByRole: jest.fn().mockResolvedValue(0) };
-    invitations = { countPendingByRole: jest.fn().mockResolvedValue(0) };
-    useCase = new DeleteRoleUseCase(
-      roles,
-      memberships as unknown as MembershipRepository,
-      invitations as unknown as InvitationRepository,
-    );
+    useCase = new DeleteRoleUseCase(roles, memberships as unknown as MembershipRepository);
   });
 
-  it('deletes a role with no members or pending invitations', async () => {
+  it('deletes a role with no members', async () => {
     roles.findById.mockResolvedValue(role());
 
     await useCase.execute('role-1');
@@ -137,13 +130,6 @@ describe('DeleteRoleUseCase', () => {
   it('rejects deleting a role in use by a membership', async () => {
     roles.findById.mockResolvedValue(role());
     memberships.countByRole.mockResolvedValue(1);
-
-    await expect(useCase.execute('role-1')).rejects.toBeInstanceOf(RoleInUseError);
-  });
-
-  it('rejects deleting a role in use by a pending invitation', async () => {
-    roles.findById.mockResolvedValue(role());
-    invitations.countPendingByRole.mockResolvedValue(1);
 
     await expect(useCase.execute('role-1')).rejects.toBeInstanceOf(RoleInUseError);
   });
