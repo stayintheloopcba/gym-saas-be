@@ -27,16 +27,16 @@ describe('OrganizationPermissionService', () => {
 
   it('grants a permission the role has in role_permissions', async () => {
     repository.findMembershipRole.mockResolvedValue(roleInfo());
-    repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.MEMBERS_INVITE]);
+    repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.MEMBERS_REMOVE]);
 
-    await expect(service.checkPermission('user-1', 'org-1', PERMISSIONS.MEMBERS_INVITE)).resolves.toBe(true);
+    await expect(service.checkPermission('user-1', 'org-1', PERMISSIONS.MEMBERS_REMOVE)).resolves.toBe(true);
   });
 
   it('denies a permission absent from role_permissions', async () => {
     repository.findMembershipRole.mockResolvedValue(roleInfo());
     repository.findPermissionCodes.mockResolvedValue([]);
 
-    await expect(service.checkPermission('user-1', 'org-1', PERMISSIONS.RESOURCES_DELETE)).resolves.toBe(false);
+    await expect(service.checkPermission('user-1', 'org-1', PERMISSIONS.SETTINGS_UPDATE)).resolves.toBe(false);
   });
 
   it('denies users without an active membership', async () => {
@@ -69,14 +69,14 @@ describe('OrganizationPermissionService', () => {
       repository.findMembershipRole.mockResolvedValue(
         roleInfo({ roleId: 'role-viewer', roleKey: 'receptionist', roleName: 'Recepcionista' }),
       );
-      repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.ORGANIZATION_READ, PERMISSIONS.RESOURCES_READ]);
+      repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.ORGANIZATION_READ, PERMISSIONS.MEMBERS_READ]);
 
       const effective = await service.getEffectivePermissions('user-1', 'org-1');
 
       expect(effective).toEqual({
         role: { id: 'role-viewer', key: 'receptionist', name: 'Recepcionista' },
         hierarchyLevel: HierarchyLevel.ORGANIZATION,
-        permissions: [PERMISSIONS.ORGANIZATION_READ, PERMISSIONS.RESOURCES_READ],
+        permissions: [PERMISSIONS.ORGANIZATION_READ, PERMISSIONS.MEMBERS_READ],
       });
     });
   });

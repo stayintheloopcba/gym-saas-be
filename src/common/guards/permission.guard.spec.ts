@@ -26,7 +26,7 @@ describe('PermissionGuard', () => {
     }) as ExecutionContext;
 
   const ownershipOptions = {
-    permission: PERMISSIONS.RESOURCES_UPDATE,
+    permission: PERMISSIONS.SETTINGS_UPDATE,
     resource: 'resource',
     resourceId: (req: { params: Record<string, string> }) => req.params.resourceId,
   };

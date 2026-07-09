@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InvitationsModule } from '../invitations/invitations.module';
 import { MembershipsModule } from '../memberships/memberships.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { StorageModule } from '../storage/storage.module';
@@ -21,18 +20,11 @@ import { OnboardingController } from './interfaces/onboarding.controller';
 import { OrganizationsController } from './interfaces/organizations.controller';
 
 /**
- * Módulo de organizaciones (capas DDD). Importa memberships, permisos e
- * invitaciones (para el onboarding-status). Aloja también el
- * `OnboardingController`, parte de la capacidad `organization-context`.
+ * Módulo de organizaciones (capas DDD). Importa memberships y permisos. Aloja
+ * también el `OnboardingController`, parte de la capacidad `organization-context`.
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Organization]),
-    MembershipsModule,
-    InvitationsModule,
-    PermissionsModule,
-    StorageModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Organization]), MembershipsModule, PermissionsModule, StorageModule],
   controllers: [OrganizationsController, OnboardingController],
   providers: [
     { provide: ORGANIZATION_REPOSITORY, useClass: TypeOrmOrganizationRepository },

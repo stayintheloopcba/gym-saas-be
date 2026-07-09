@@ -17,12 +17,12 @@ export class RoleKeyConflictError extends DomainError {
   }
 }
 
-/** No se puede eliminar un rol referenciado por una membresía activa o una invitación pendiente. */
+/** No se puede eliminar un rol referenciado por una membresía activa. */
 export class RoleInUseError extends DomainError {
   readonly status = 409;
 
   constructor() {
-    super('This role is in use by one or more members or pending invitations and cannot be deleted');
+    super('This role is in use by one or more members and cannot be deleted');
   }
 }
 

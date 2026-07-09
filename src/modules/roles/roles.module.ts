@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InvitationsModule } from '../invitations/invitations.module';
 import { MembershipsModule } from '../memberships/memberships.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { Role } from '../permissions/domain/role.entity';
@@ -24,14 +23,7 @@ import { RolesController } from './interfaces/roles.controller';
  * Reutiliza la entidad `Role` del módulo de permisos.
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Role]),
-    PermissionsModule,
-    MembershipsModule,
-    InvitationsModule,
-    PlatformAdminModule,
-    UsersModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Role]), PermissionsModule, MembershipsModule, PlatformAdminModule, UsersModule],
   controllers: [RolesController, AdminRolesController, AdminPermissionsController, MyPermissionsController],
   providers: [
     { provide: ROLE_REPOSITORY, useClass: TypeOrmRoleRepository },

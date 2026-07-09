@@ -2,7 +2,7 @@
  * Convierte una duración tipo `"7d"`, `"48h"`, `"30m"`, `"15s"` o `"1000ms"` a
  * milisegundos. Un número sin unidad se interpreta como milisegundos.
  *
- * Se usa para `INVITATION_TTL` (TTL de invitaciones) sin sumar una dependencia.
+ * Se usa para TTLs configurables (p. ej. `JWT_REFRESH_EXPIRES_IN`) sin sumar una dependencia.
  * Lanza si el formato es inválido para fallar temprano en el arranque/uso.
  */
 const UNIT_MS: Record<string, number> = {

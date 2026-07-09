@@ -52,12 +52,12 @@ The system SHALL provide an `ActiveOrgGuard` that rejects requests lacking a val
 
 ### Requirement: Onboarding status
 
-The system SHALL expose an endpoint that reports whether the authenticated user needs onboarding, based on their memberships and pending invitations and current active organization.
+The system SHALL expose an endpoint that reports whether the authenticated user needs onboarding, based on their memberships and current active organization.
 
 #### Scenario: New user needs onboarding
 
 - **WHEN** a user with no memberships requests `GET /onboarding/status`
-- **THEN** the response indicates the user has no organizations and lists any pending invitations addressed to their email
+- **THEN** the response indicates the user has no organizations
 
 #### Scenario: Onboarded user with an active organization
 

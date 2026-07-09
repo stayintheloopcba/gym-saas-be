@@ -9,7 +9,8 @@ import { MembershipRepository } from '../domain/membership.repository';
  *
  * Las búsquedas excluyen registros soft-deleted (TypeORM respeta
  * `@DeleteDateColumn`). `save` usa el `EntityManager` de la transacción cuando se
- * le pasa, para participar en commits atómicos (org+owner, accept invitation).
+ * le pasa, para participar en commits atómicos (p. ej. crear la organización y
+ * su membership de owner en la misma transacción).
  */
 @Injectable()
 export class TypeOrmMembershipRepository implements MembershipRepository {

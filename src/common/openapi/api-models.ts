@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AuthProvider } from '../enums/auth-provider.enum';
-import { InvitationStatus } from '../enums/invitation-status.enum';
-import { ResourceStatus } from '../../modules/resources/domain/resource-status.enum';
 
 export class RoleSummaryModel {
   @ApiProperty({ format: 'uuid' })
@@ -96,32 +94,6 @@ export class OrganizationWithRoleModel extends OrganizationModel {
   role: RoleSummaryModel;
 }
 
-export class InvitationModel {
-  @ApiProperty({ format: 'uuid' })
-  id: string;
-
-  @ApiProperty({ format: 'uuid' })
-  organizationId: string;
-
-  @ApiProperty({ format: 'email' })
-  email: string;
-
-  @ApiProperty({ type: RoleSummaryModel })
-  role: RoleSummaryModel;
-
-  @ApiProperty({ enum: InvitationStatus })
-  status: InvitationStatus;
-
-  @ApiProperty({ description: 'Opaque invitation token used by the MVP while no mailer is configured.' })
-  token: string;
-
-  @ApiProperty({ format: 'date-time' })
-  expiresAt: Date;
-
-  @ApiProperty({ format: 'date-time' })
-  createdAt: Date;
-}
-
 export class OrganizationMemberModel {
   @ApiProperty({ format: 'uuid' })
   membershipId: string;
@@ -198,14 +170,6 @@ export class OnboardingStatusModel {
 
   @ApiProperty({ format: 'uuid', nullable: true })
   activeOrganizationId: string | null;
-
-  @ApiProperty({ type: InvitationModel, isArray: true })
-  pendingInvitations: InvitationModel[];
-}
-
-export class AcceptedInvitationModel extends SuccessResponseModel {
-  @ApiProperty({ format: 'uuid' })
-  organizationId: string;
 }
 
 export class SessionModel {
@@ -229,51 +193,6 @@ export class SessionModel {
 
   @ApiProperty()
   current: boolean;
-}
-
-export class ResourceModel {
-  @ApiProperty({ format: 'uuid' })
-  id: string;
-
-  @ApiProperty({ format: 'uuid' })
-  organizationId: string;
-
-  @ApiProperty({ example: 'Example resource' })
-  name: string;
-
-  @ApiProperty({ nullable: true, example: 'Optional description' })
-  description: string | null;
-
-  @ApiProperty({ enum: ResourceStatus })
-  status: ResourceStatus;
-
-  @ApiProperty({ format: 'date-time' })
-  createdAt: Date;
-
-  @ApiProperty({ format: 'date-time', nullable: true })
-  updatedAt: Date | null;
-}
-
-export class PaginationMetaModel {
-  @ApiProperty({ minimum: 1 })
-  page: number;
-
-  @ApiProperty({ minimum: 1, maximum: 100 })
-  limit: number;
-
-  @ApiProperty({ minimum: 0 })
-  total: number;
-
-  @ApiProperty({ minimum: 0 })
-  totalPages: number;
-}
-
-export class PaginatedResourceModel {
-  @ApiProperty({ type: ResourceModel, isArray: true })
-  data: ResourceModel[];
-
-  @ApiProperty({ type: PaginationMetaModel })
-  meta: PaginationMetaModel;
 }
 
 export class RevokedSessionsModel extends SuccessResponseModel {
