@@ -224,6 +224,38 @@ export class PlanModel {
   createdAt: Date;
 }
 
+export class SubscriptionModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  planId: string;
+
+  @ApiProperty({ type: String, format: 'date' })
+  startDate: string;
+
+  @ApiProperty({ type: String, format: 'date', nullable: true })
+  endDate: string | null;
+
+  @ApiProperty({ type: String, format: 'date', nullable: true })
+  paidUntil: string | null;
+
+  @ApiProperty({ enum: ['ACTIVE', 'EXPIRED', 'CANCELLED'] })
+  status: string;
+
+  @ApiProperty({ enum: ['AUTO', 'MANUAL'] })
+  renewalMode: string;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
 export class MemberModel {
   @ApiProperty({ format: 'uuid' })
   id: string;

@@ -19,6 +19,7 @@ import { PlansModule } from './modules/plans/plans.module';
 import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -43,6 +44,7 @@ import { UsersModule } from './modules/users/users.module';
     BranchesModule,
     DisciplinesModule,
     PlansModule,
+    SubscriptionsModule,
     StorageModule,
   ],
   controllers: [AppController],
