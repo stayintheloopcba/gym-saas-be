@@ -7,12 +7,14 @@ import { MemberNotFoundError } from '../domain/member.errors';
 import { MEMBER_REPOSITORY } from '../domain/member.repository';
 import type { MemberRepository } from '../domain/member.repository';
 import { MemberView, toMemberView } from '../interfaces/member.view';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 @Injectable()
 export class GetMemberUseCase {
   constructor(
     @Inject(MEMBER_REPOSITORY) private readonly members: MemberRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
+    private readonly resolveMemberStatus: ResolveMemberStatus,
     private readonly permissions: GymPermissionService,
   ) {}
 
@@ -29,6 +31,7 @@ export class GetMemberUseCase {
       throw new MemberNotFoundError(memberId);
     }
 
-    return toMemberView(member, role);
+    const status = await this.resolveMemberStatus.execute(gymId, member);
+    return toMemberView(member, role, status);
   }
 }

@@ -11,6 +11,7 @@ import {
 } from '../domain/member.errors';
 import { MemberRepository } from '../domain/member.repository';
 import { ChangeMemberRoleUseCase } from './change-member-role.use-case';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 const OWNER = { id: 'role-owner', key: 'owner', name: 'Dueño' };
 const INSTRUCTOR = { id: 'role-instructor', key: 'instructor', name: 'Instructor' };
@@ -31,6 +32,7 @@ const buildMember = (overrides: Partial<Member> = {}): Member =>
 describe('ChangeMemberRoleUseCase', () => {
   let members: jest.Mocked<Pick<MemberRepository, 'findById' | 'countByRoleInGym' | 'save'>>;
   let permissionsRepo: jest.Mocked<Pick<PermissionRepository, 'findRoleSummary'>>;
+  let resolveMemberStatus: jest.Mocked<Pick<ResolveMemberStatus, 'execute'>>;
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let useCase: ChangeMemberRoleUseCase;
 
@@ -41,10 +43,12 @@ describe('ChangeMemberRoleUseCase', () => {
       save: jest.fn((member: Member) => Promise.resolve(member)),
     };
     permissionsRepo = { findRoleSummary: jest.fn() };
+    resolveMemberStatus = { execute: jest.fn().mockResolvedValue(MemberStatus.ACTIVE) };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     useCase = new ChangeMemberRoleUseCase(
       members as unknown as MemberRepository,
       permissionsRepo as unknown as PermissionRepository,
+      resolveMemberStatus as unknown as ResolveMemberStatus,
       permissions as unknown as GymPermissionService,
     );
   });

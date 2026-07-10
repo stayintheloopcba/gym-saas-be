@@ -4,6 +4,7 @@ import { Member } from '../domain/member.entity';
 import { MemberStatus } from '../domain/member-status.enum';
 import { DuplicateMemberError, MemberNotFoundError } from '../domain/member.errors';
 import { MemberRepository } from '../domain/member.repository';
+import { ResolveMemberStatus } from './resolve-member-status';
 import { UpdateMemberUseCase } from './update-member.use-case';
 
 const buildMember = (overrides: Partial<Member> = {}): Member =>
@@ -21,6 +22,7 @@ const buildMember = (overrides: Partial<Member> = {}): Member =>
 describe('UpdateMemberUseCase', () => {
   let members: jest.Mocked<Pick<MemberRepository, 'findById' | 'findByGymAndDocumentId' | 'save'>>;
   let permissionsRepo: jest.Mocked<Pick<PermissionRepository, 'findRoleSummary'>>;
+  let resolveMemberStatus: jest.Mocked<Pick<ResolveMemberStatus, 'execute'>>;
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let useCase: UpdateMemberUseCase;
 
@@ -33,10 +35,12 @@ describe('UpdateMemberUseCase', () => {
     permissionsRepo = {
       findRoleSummary: jest.fn().mockResolvedValue({ id: 'role-1', key: 'student', name: 'Student' }),
     };
+    resolveMemberStatus = { execute: jest.fn().mockResolvedValue(MemberStatus.ACTIVE) };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     useCase = new UpdateMemberUseCase(
       members as unknown as MemberRepository,
       permissionsRepo as unknown as PermissionRepository,
+      resolveMemberStatus as unknown as ResolveMemberStatus,
       permissions as unknown as GymPermissionService,
     );
   });

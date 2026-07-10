@@ -3,9 +3,9 @@ import { Member } from '../domain/member.entity';
 import { MemberStatus } from '../domain/member-status.enum';
 
 /**
- * Forma pública de un `Member` en las respuestas HTTP. `status` refleja el
- * valor persistido — la derivación a `OVERDUE` por mora se agrega en una
- * tarea posterior (una vez exista `subscriptions`/`payments`).
+ * Forma pública de un `Member` en las respuestas HTTP. `status` es el que
+ * devuelve `ResolveMemberStatus`: puede reflejar `OVERDUE` derivado en
+ * lectura (Technical Decision #6) aunque el valor persistido siga `ACTIVE`.
  */
 export interface MemberView {
   id: string;
@@ -27,7 +27,7 @@ export interface MemberView {
   createdAt: Date;
 }
 
-export function toMemberView(member: Member, role: RoleSummary): MemberView {
+export function toMemberView(member: Member, role: RoleSummary, status: MemberStatus = member.status): MemberView {
   return {
     id: member.id,
     gymId: member.gymId,
@@ -43,7 +43,7 @@ export function toMemberView(member: Member, role: RoleSummary): MemberView {
     photoUrl: member.photoUrl,
     emergencyContactName: member.emergencyContactName,
     emergencyContactPhone: member.emergencyContactPhone,
-    status: member.status,
+    status,
     consents: member.consents,
     createdAt: member.createdAt,
   };

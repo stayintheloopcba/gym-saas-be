@@ -8,6 +8,7 @@ import { Member } from '../domain/member.entity';
 import { MEMBER_REPOSITORY } from '../domain/member.repository';
 import type { MemberRepository } from '../domain/member.repository';
 import { MemberView, toMemberView } from '../interfaces/member.view';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 export interface UpdateMemberCommand {
   callerUserId: string;
@@ -31,6 +32,7 @@ export class UpdateMemberUseCase {
   constructor(
     @Inject(MEMBER_REPOSITORY) private readonly members: MemberRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
+    private readonly resolveMemberStatus: ResolveMemberStatus,
     private readonly permissions: GymPermissionService,
   ) {}
 
@@ -56,7 +58,8 @@ export class UpdateMemberUseCase {
     if (!role) {
       throw new MemberNotFoundError(command.memberId);
     }
-    return toMemberView(saved, role);
+    const status = await this.resolveMemberStatus.execute(command.gymId, saved);
+    return toMemberView(saved, role, status);
   }
 
   /** Copia solo los campos provistos (`undefined` = sin cambios) del comando al `Member`. */

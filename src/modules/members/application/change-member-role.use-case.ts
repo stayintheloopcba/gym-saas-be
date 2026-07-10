@@ -13,6 +13,7 @@ import {
 import { MEMBER_REPOSITORY } from '../domain/member.repository';
 import type { MemberRepository } from '../domain/member.repository';
 import { MemberView, toMemberView } from '../interfaces/member.view';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 const OWNER_ROLE_KEY = 'owner';
 
@@ -39,6 +40,7 @@ export class ChangeMemberRoleUseCase {
   constructor(
     @Inject(MEMBER_REPOSITORY) private readonly members: MemberRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
+    private readonly resolveMemberStatus: ResolveMemberStatus,
     private readonly permissions: GymPermissionService,
   ) {}
 
@@ -64,7 +66,8 @@ export class ChangeMemberRoleUseCase {
     }
 
     if (target.roleId === role.id) {
-      return toMemberView(target, role);
+      const status = await this.resolveMemberStatus.execute(gymId, target);
+      return toMemberView(target, role, status);
     }
 
     const currentRole = await this.permissionsRepo.findRoleSummary(target.roleId);
@@ -77,6 +80,7 @@ export class ChangeMemberRoleUseCase {
 
     target.roleId = role.id;
     const saved = await this.members.save(target);
-    return toMemberView(saved, role);
+    const status = await this.resolveMemberStatus.execute(gymId, saved);
+    return toMemberView(saved, role, status);
   }
 }

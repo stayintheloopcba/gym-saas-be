@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MembersModule } from '../members/members.module';
 import { PermissionsModule } from '../permissions/permissions.module';
@@ -13,10 +13,12 @@ import { SubscriptionsController } from './interfaces/subscriptions.controller';
 
 /**
  * Módulo de suscripciones. Exporta `SUBSCRIPTION_REPOSITORY` para que
- * `payments` (task 16) recompute `paidUntil` al crear/anular un pago.
+ * `payments` (task 16) recompute `paidUntil` al crear/anular un pago, y
+ * `members` (task 17, vía `forwardRef` — ver nota en `members.module.ts`)
+ * derive el status `OVERDUE` en lectura.
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Subscription]), PermissionsModule, MembersModule, PlansModule],
+  imports: [TypeOrmModule.forFeature([Subscription]), PermissionsModule, forwardRef(() => MembersModule), PlansModule],
   controllers: [SubscriptionsController],
   providers: [
     { provide: SUBSCRIPTION_REPOSITORY, useClass: TypeOrmSubscriptionRepository },

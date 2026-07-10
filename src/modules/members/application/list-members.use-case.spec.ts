@@ -4,6 +4,7 @@ import { Member } from '../domain/member.entity';
 import { MemberStatus } from '../domain/member-status.enum';
 import { MemberRepository } from '../domain/member.repository';
 import { ListMembersUseCase } from './list-members.use-case';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 const buildMember = (id: string): Member =>
   Object.assign(new Member(), { id, gymId: 'gym-1', roleId: 'role-1', firstName: 'Ada', status: MemberStatus.ACTIVE });
@@ -11,16 +12,19 @@ const buildMember = (id: string): Member =>
 describe('ListMembersUseCase', () => {
   let members: jest.Mocked<Pick<MemberRepository, 'list'>>;
   let permissionsRepo: jest.Mocked<Pick<PermissionRepository, 'findRoleSummary'>>;
+  let resolveMemberStatus: jest.Mocked<Pick<ResolveMemberStatus, 'execute'>>;
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let useCase: ListMembersUseCase;
 
   beforeEach(() => {
     members = { list: jest.fn() };
     permissionsRepo = { findRoleSummary: jest.fn() };
+    resolveMemberStatus = { execute: jest.fn().mockResolvedValue(MemberStatus.ACTIVE) };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     useCase = new ListMembersUseCase(
       members as unknown as MemberRepository,
       permissionsRepo as unknown as PermissionRepository,
+      resolveMemberStatus as unknown as ResolveMemberStatus,
       permissions as unknown as GymPermissionService,
     );
   });

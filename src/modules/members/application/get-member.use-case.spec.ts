@@ -5,6 +5,7 @@ import { MemberStatus } from '../domain/member-status.enum';
 import { MemberNotFoundError } from '../domain/member.errors';
 import { MemberRepository } from '../domain/member.repository';
 import { GetMemberUseCase } from './get-member.use-case';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 const buildMember = (): Member =>
   Object.assign(new Member(), {
@@ -19,16 +20,19 @@ const buildMember = (): Member =>
 describe('GetMemberUseCase', () => {
   let members: jest.Mocked<Pick<MemberRepository, 'findById'>>;
   let permissionsRepo: jest.Mocked<Pick<PermissionRepository, 'findRoleSummary'>>;
+  let resolveMemberStatus: jest.Mocked<Pick<ResolveMemberStatus, 'execute'>>;
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let useCase: GetMemberUseCase;
 
   beforeEach(() => {
     members = { findById: jest.fn() };
     permissionsRepo = { findRoleSummary: jest.fn() };
+    resolveMemberStatus = { execute: jest.fn().mockResolvedValue(MemberStatus.ACTIVE) };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     useCase = new GetMemberUseCase(
       members as unknown as MemberRepository,
       permissionsRepo as unknown as PermissionRepository,
+      resolveMemberStatus as unknown as ResolveMemberStatus,
       permissions as unknown as GymPermissionService,
     );
   });
@@ -41,6 +45,16 @@ describe('GetMemberUseCase', () => {
 
     expect(view.id).toBe('member-1');
     expect(view.role).toEqual({ id: 'role-1', key: 'student', name: 'Student' });
+  });
+
+  it('reflects the derived status instead of the stored one', async () => {
+    members.findById.mockResolvedValue(buildMember());
+    permissionsRepo.findRoleSummary.mockResolvedValue({ id: 'role-1', key: 'student', name: 'Student' });
+    resolveMemberStatus.execute.mockResolvedValue(MemberStatus.OVERDUE);
+
+    const view = await useCase.execute('admin', 'gym-1', 'member-1');
+
+    expect(view.status).toBe(MemberStatus.OVERDUE);
   });
 
   it('throws MemberNotFoundError when the member does not exist in the gym', async () => {

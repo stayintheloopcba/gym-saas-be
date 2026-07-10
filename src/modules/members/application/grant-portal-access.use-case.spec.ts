@@ -8,6 +8,7 @@ import { MemberStatus } from '../domain/member-status.enum';
 import { DuplicateMemberError, MemberAlreadyLinkedError, MemberNotFoundError } from '../domain/member.errors';
 import { MemberRepository } from '../domain/member.repository';
 import { GrantPortalAccessUseCase } from './grant-portal-access.use-case';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 const buildMember = (overrides: Partial<Member> = {}): Member =>
   Object.assign(new Member(), {
@@ -24,6 +25,7 @@ const buildMember = (overrides: Partial<Member> = {}): Member =>
 describe('GrantPortalAccessUseCase', () => {
   let members: jest.Mocked<Pick<MemberRepository, 'findById' | 'findByGymAndUserId' | 'save'>>;
   let permissionsRepo: jest.Mocked<Pick<PermissionRepository, 'findRoleSummary'>>;
+  let resolveMemberStatus: jest.Mocked<Pick<ResolveMemberStatus, 'execute'>>;
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let findUserByEmail: jest.Mocked<Pick<FindUserByEmailUseCase, 'execute'>>;
   let createUser: jest.Mocked<Pick<CreateUserUseCase, 'execute'>>;
@@ -38,12 +40,14 @@ describe('GrantPortalAccessUseCase', () => {
     permissionsRepo = {
       findRoleSummary: jest.fn().mockResolvedValue({ id: 'role-1', key: 'student', name: 'Student' }),
     };
+    resolveMemberStatus = { execute: jest.fn().mockResolvedValue(MemberStatus.ACTIVE) };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     findUserByEmail = { execute: jest.fn() };
     createUser = { execute: jest.fn() };
     useCase = new GrantPortalAccessUseCase(
       members as unknown as MemberRepository,
       permissionsRepo as unknown as PermissionRepository,
+      resolveMemberStatus as unknown as ResolveMemberStatus,
       permissions as unknown as GymPermissionService,
       findUserByEmail as unknown as FindUserByEmailUseCase,
       createUser as unknown as CreateUserUseCase,

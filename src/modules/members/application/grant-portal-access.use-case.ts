@@ -10,6 +10,7 @@ import { DuplicateMemberError, MemberAlreadyLinkedError, MemberNotFoundError } f
 import { MEMBER_REPOSITORY } from '../domain/member.repository';
 import type { MemberRepository } from '../domain/member.repository';
 import { MemberView, toMemberView } from '../interfaces/member.view';
+import { ResolveMemberStatus } from './resolve-member-status';
 
 export interface GrantPortalAccessCommand {
   callerUserId: string;
@@ -31,6 +32,7 @@ export class GrantPortalAccessUseCase {
   constructor(
     @Inject(MEMBER_REPOSITORY) private readonly members: MemberRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
+    private readonly resolveMemberStatus: ResolveMemberStatus,
     private readonly permissions: GymPermissionService,
     private readonly findUserByEmail: FindUserByEmailUseCase,
     private readonly createUser: CreateUserUseCase,
@@ -67,6 +69,7 @@ export class GrantPortalAccessUseCase {
     if (!role) {
       throw new MemberNotFoundError(memberId);
     }
-    return toMemberView(saved, role);
+    const status = await this.resolveMemberStatus.execute(gymId, saved);
+    return toMemberView(saved, role, status);
   }
 }
