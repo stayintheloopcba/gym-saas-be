@@ -40,7 +40,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 14 | `Plans` module with branch/discipline joins | 13 | [x] |
 | 15 | `Subscriptions` module | 5, 14 | [x] |
 | 16 | `Payments` module | 10, 15 | [x] |
-| 17 | Derived overdue on read | 16 | [ ] |
+| 17 | Derived overdue on read | 16 | [x] |
 | 18 | `AccessLogs` module | 11, 17 | [ ] |
 | 19 | `Routines` module | 5 | [ ] |
 | 20 | Routine assignments | 19 | [ ] |
