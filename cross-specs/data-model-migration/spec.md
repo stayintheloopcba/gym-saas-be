@@ -43,7 +43,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 17 | Derived overdue on read | 16 | [x] |
 | 18 | `AccessLogs` module | 11, 17 | [x] |
 | 19 | `Routines` module | 5 | [x] |
-| 20 | Routine assignments | 19 | [ ] |
+| 20 | Routine assignments | 19 | [x] |
 | 21 | `Progress` module | 19 | [ ] |
 | 22 | Index/constraint pass + OpenAPI + full regression | 8, 9, 14, 17, 18, 20, 21 | [ ] |
 | 23 | E2E contract test: full member lifecycle | 22 | [ ] |
