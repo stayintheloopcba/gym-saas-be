@@ -33,7 +33,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 7 | `POST /gyms` creates owner Member in same unit of work | 3, 4 | [x] |
 | 8 | Delete `memberships` module | 4, 6, 7 | [x] |
 | 9 | Extend catalog seeder: new permission matrix + `student` role | 2, 3 | [x] |
-| 10 | `GymSettings` module | 1 | [ ] |
+| 10 | `GymSettings` module | 1 | [x] |
 | 11 | `Branches` module | 1 | [ ] |
 | 12 | `Disciplines` global catalog | 1 | [ ] |
 | 13 | Branch offered-disciplines replace-set | 11, 12 | [ ] |
