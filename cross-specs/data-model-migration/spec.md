@@ -30,7 +30,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 4 | Repoint RBAC resolution to `members` | 3 | [x] |
 | 5 | Members CRUD endpoints | 3 | [x] |
 | 6 | Member role-change + grant-portal-access endpoints | 5 | [x] |
-| 7 | `POST /gyms` creates owner Member in same unit of work | 3, 4 | [ ] |
+| 7 | `POST /gyms` creates owner Member in same unit of work | 3, 4 | [x] |
 | 8 | Delete `memberships` module | 4, 6, 7 | [ ] |
 | 9 | Extend catalog seeder: new permission matrix + `student` role | 2, 3 | [ ] |
 | 10 | `GymSettings` module | 1 | [ ] |
