@@ -15,6 +15,7 @@ import { DisciplinesModule } from './modules/disciplines/disciplines.module';
 import { GymSettingsModule } from './modules/gym-settings/gym-settings.module';
 import { GymsModule } from './modules/gyms/gyms.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
+import { PlansModule } from './modules/plans/plans.module';
 import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -41,6 +42,7 @@ import { UsersModule } from './modules/users/users.module';
     GymSettingsModule,
     BranchesModule,
     DisciplinesModule,
+    PlansModule,
     StorageModule,
   ],
   controllers: [AppController],

@@ -186,6 +186,44 @@ export class DisciplineModel {
   active: boolean;
 }
 
+export class PlanModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ example: 'Full access' })
+  name: string;
+
+  @ApiProperty({ example: 15000 })
+  price: number;
+
+  @ApiProperty({ example: 'ARS' })
+  currency: string;
+
+  @ApiProperty({ enum: ['WEEKLY', 'MONTHLY', 'QUARTERLY', 'BIANNUAL', 'ANNUAL'] })
+  periodicity: string;
+
+  @ApiProperty({ type: Number, nullable: true, description: 'null = unlimited' })
+  visitsPerMonth: number | null;
+
+  @ApiProperty({ type: Object, nullable: true })
+  timeWindow: Record<string, unknown> | null;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ type: String, isArray: true, format: 'uuid' })
+  branchIds: string[];
+
+  @ApiProperty({ type: String, isArray: true, format: 'uuid' })
+  disciplineIds: string[];
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
 export class MemberModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
