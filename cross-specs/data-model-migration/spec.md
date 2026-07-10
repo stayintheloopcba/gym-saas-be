@@ -26,7 +26,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 |---|------|------------|--------|
 | 1 | Rename `organizations` module → `gyms`: entity/table, `/gyms` routes, views/DTOs, active-gym cookie + guard, onboarding; full suite green | — | [x] |
 | 2 | Rename permission codes `organization:*` → `gym:*` (permission-key, seeder, decorators, tests) | 1 | [x] |
-| 3 | `Member` entity + repository port | 1 | [ ] |
+| 3 | `Member` entity + repository port | 1 | [x] |
 | 4 | Repoint RBAC resolution to `members` | 3 | [ ] |
 | 5 | Members CRUD endpoints | 3 | [ ] |
 | 6 | Member role-change + grant-portal-access endpoints | 5 | [ ] |
