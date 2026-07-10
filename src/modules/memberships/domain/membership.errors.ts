@@ -25,7 +25,7 @@ export class SoleOwnerError extends DomainError {
   readonly status = 409;
 
   constructor() {
-    super('The sole owner of an gym cannot be removed or demoted');
+    super('The sole owner of a gym cannot be removed or demoted');
   }
 }
 

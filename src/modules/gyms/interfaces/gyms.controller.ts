@@ -78,7 +78,7 @@ export class GymsController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create an gym and its owner membership' })
+  @ApiOperation({ summary: 'Create a gym and its owner membership' })
   @ApiCreatedResponse({ type: GymModel })
   @ApiBadRequestResponse({ type: ErrorResponseModel })
   async create(
@@ -111,7 +111,7 @@ export class GymsController {
 
   @Get(':id')
   @RequirePermissions(PERMISSIONS.ORGANIZATION_READ)
-  @ApiOperation({ summary: 'Get an gym where the user is an active member' })
+  @ApiOperation({ summary: 'Get a gym where the user is an active member' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: GymModel })
   @ApiForbiddenResponse({ type: ErrorResponseModel })
@@ -122,7 +122,7 @@ export class GymsController {
 
   @Patch(':id')
   @RequirePermissions(PERMISSIONS.ORGANIZATION_UPDATE)
-  @ApiOperation({ summary: 'Update an gym name and/or branding' })
+  @ApiOperation({ summary: 'Update a gym name and/or branding' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: GymModel })
   @ApiBadRequestResponse({ type: ErrorResponseModel })
@@ -172,7 +172,7 @@ export class GymsController {
 
   @Delete(':id')
   @RequirePermissions(PERMISSIONS.ORGANIZATION_DELETE)
-  @ApiOperation({ summary: 'Soft-delete an gym' })
+  @ApiOperation({ summary: 'Soft-delete a gym' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiNoContentResponse()
   @ApiForbiddenResponse({ type: ErrorResponseModel })

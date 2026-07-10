@@ -43,7 +43,7 @@ describe('RegisterUseCase', () => {
     );
   });
 
-  it('hashes the password, creates a LOCAL user and provisions an gym', async () => {
+  it('hashes the password, creates a LOCAL user and provisions a gym', async () => {
     const result = await useCase.execute(command);
 
     expect(hasher.hash).toHaveBeenCalledWith('plain123');
