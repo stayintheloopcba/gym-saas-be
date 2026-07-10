@@ -1,4 +1,5 @@
 import { RoutineScope } from '../../../common/enums/routine-scope.enum';
+import { RoutineAssignment } from '../domain/routine-assignment.entity';
 import { RoutineItem } from '../domain/routine-item.entity';
 import { Routine } from '../domain/routine.entity';
 
@@ -48,4 +49,34 @@ export function toRoutineView(routine: Routine, items: RoutineItem[]): RoutineVi
     items: items.map(toRoutineItemView),
     createdAt: routine.createdAt,
   };
+}
+
+export interface AssignmentView {
+  id: string;
+  gymId: string;
+  memberId: string;
+  routineId: string;
+  assignedByMemberId: string | null;
+  assignedAt: Date;
+  unassignedAt: Date | null;
+}
+
+export function toAssignmentView(assignment: RoutineAssignment): AssignmentView {
+  return {
+    id: assignment.id,
+    gymId: assignment.gymId,
+    memberId: assignment.memberId,
+    routineId: assignment.routineId,
+    assignedByMemberId: assignment.assignedByMemberId,
+    assignedAt: assignment.assignedAt,
+    unassignedAt: assignment.unassignedAt,
+  };
+}
+
+export interface MemberRoutineView extends AssignmentView {
+  routine: RoutineView;
+}
+
+export function toMemberRoutineView(assignment: RoutineAssignment, routine: RoutineView): MemberRoutineView {
+  return { ...toAssignmentView(assignment), routine };
 }

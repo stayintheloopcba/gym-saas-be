@@ -533,3 +533,31 @@ export class RoutineModel {
   @ApiProperty({ format: 'date-time' })
   createdAt: Date;
 }
+
+export class AssignmentModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  routineId: string;
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  assignedByMemberId: string | null;
+
+  @ApiProperty({ format: 'date-time' })
+  assignedAt: Date;
+
+  @ApiProperty({ format: 'date-time', nullable: true })
+  unassignedAt: Date | null;
+}
+
+export class MemberRoutineModel extends AssignmentModel {
+  @ApiProperty({ type: RoutineModel })
+  routine: RoutineModel;
+}

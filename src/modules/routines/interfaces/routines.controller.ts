@@ -27,20 +27,23 @@ import { RequirePermissions } from '../../../common/decorators/require-permissio
 import { DomainExceptionFilter } from '../../../common/errors/domain-exception.filter';
 import { ActiveGymGuard } from '../../../common/guards/active-gym.guard';
 import { PermissionGuard } from '../../../common/guards/permission.guard';
-import { ErrorResponseModel, RoutineModel } from '../../../common/openapi/api-models';
+import { AssignmentModel, ErrorResponseModel, RoutineModel } from '../../../common/openapi/api-models';
 import { ACCESS_TOKEN_SECURITY, ACTIVE_GYM_SECURITY } from '../../../config/openapi.config';
 import { CurrentUser } from '../../auth/interfaces/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/interfaces/jwt-auth.guard';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
 import type { UserPublicProfile } from '../../users/application/user-public-profile';
+import { AssignRoutineUseCase } from '../application/assign-routine.use-case';
 import { CreateRoutineUseCase } from '../application/create-routine.use-case';
 import { GetRoutineUseCase } from '../application/get-routine.use-case';
 import { ListRoutinesUseCase } from '../application/list-routines.use-case';
 import { RemoveRoutineUseCase } from '../application/remove-routine.use-case';
+import { UnassignRoutineUseCase } from '../application/unassign-routine.use-case';
 import { UpdateRoutineUseCase } from '../application/update-routine.use-case';
+import { AssignRoutineDto } from './dto/assign-routine.dto';
 import { CreateRoutineDto } from './dto/create-routine.dto';
 import { UpdateRoutineDto } from './dto/update-routine.dto';
-import { RoutineView } from './routine.view';
+import { AssignmentView, RoutineView } from './routine.view';
 
 @Controller('gyms/:id/routines')
 @UseGuards(JwtAuthGuard, ActiveGymGuard, PermissionGuard)
@@ -55,6 +58,8 @@ export class RoutinesController {
     private readonly getRoutine: GetRoutineUseCase,
     private readonly updateRoutine: UpdateRoutineUseCase,
     private readonly removeRoutine: RemoveRoutineUseCase,
+    private readonly assignRoutine: AssignRoutineUseCase,
+    private readonly unassignRoutine: UnassignRoutineUseCase,
   ) {}
 
   @Post()
@@ -129,5 +134,39 @@ export class RoutinesController {
     @Param('routineId', ParseUUIDPipe) routineId: string,
   ): Promise<void> {
     await this.removeRoutine.execute(user.id, gymId, routineId);
+  }
+
+  @Post(':routineId/assignments')
+  @RequirePermissions(PERMISSIONS.ROUTINES_ASSIGN)
+  @ApiOperation({ summary: 'Assign a routine to a member' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'routineId', format: 'uuid' })
+  @ApiCreatedResponse({ type: AssignmentModel })
+  @ApiForbiddenResponse({ type: ErrorResponseModel })
+  @ApiNotFoundResponse({ type: ErrorResponseModel })
+  assign(
+    @CurrentUser() user: UserPublicProfile,
+    @Param('id', ParseUUIDPipe) gymId: string,
+    @Param('routineId', ParseUUIDPipe) routineId: string,
+    @Body() dto: AssignRoutineDto,
+  ): Promise<AssignmentView> {
+    return this.assignRoutine.execute({ callerUserId: user.id, gymId, routineId, memberId: dto.memberId });
+  }
+
+  @Post(':routineId/assignments/:assignmentId/unassign')
+  @RequirePermissions(PERMISSIONS.ROUTINES_ASSIGN)
+  @ApiOperation({ summary: 'Unassign a routine from a member' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'routineId', format: 'uuid' })
+  @ApiParam({ name: 'assignmentId', format: 'uuid' })
+  @ApiOkResponse({ type: AssignmentModel })
+  @ApiForbiddenResponse({ type: ErrorResponseModel })
+  @ApiNotFoundResponse({ type: ErrorResponseModel })
+  unassign(
+    @CurrentUser() user: UserPublicProfile,
+    @Param('id', ParseUUIDPipe) gymId: string,
+    @Param('assignmentId', ParseUUIDPipe) assignmentId: string,
+  ): Promise<AssignmentView> {
+    return this.unassignRoutine.execute(user.id, gymId, assignmentId);
   }
 }
