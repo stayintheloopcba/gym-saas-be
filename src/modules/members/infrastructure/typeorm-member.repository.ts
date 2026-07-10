@@ -25,6 +25,10 @@ export class TypeOrmMemberRepository implements MemberRepository {
     return this.repo.findOne({ where: { gymId, documentId } });
   }
 
+  findByUserId(userId: string): Promise<Member[]> {
+    return this.repo.find({ where: { userId } });
+  }
+
   async list(gymId: string, filters: MemberListFilters): Promise<Member[]> {
     const qb = this.repo.createQueryBuilder('member').where('member.gym_id = :gymId', { gymId });
 
@@ -51,6 +55,10 @@ export class TypeOrmMemberRepository implements MemberRepository {
 
   countByRoleInGym(gymId: string, roleId: string): Promise<number> {
     return this.repo.count({ where: { gymId, roleId } });
+  }
+
+  countByRole(roleId: string): Promise<number> {
+    return this.repo.count({ where: { roleId } });
   }
 
   save(member: Member): Promise<Member> {

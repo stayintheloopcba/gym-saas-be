@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MembershipContextPort } from '../../../common/context/membership-context.port';
-import { Member } from '../../members/domain/member.entity';
+import { Member } from '../domain/member.entity';
 
 /**
  * Adapter del `MembershipContextPort` que consume `AuthContextMiddleware` para
@@ -11,7 +11,7 @@ import { Member } from '../../members/domain/member.entity';
  * confirmar que el usuario tiene un `Member` activo en el gym.
  */
 @Injectable()
-export class TypeOrmMembershipContextAdapter implements MembershipContextPort {
+export class TypeOrmMemberContextAdapter implements MembershipContextPort {
   constructor(@InjectRepository(Member) private readonly repo: Repository<Member>) {}
 
   async isActiveMember(userId: string, gymId: string): Promise<boolean> {

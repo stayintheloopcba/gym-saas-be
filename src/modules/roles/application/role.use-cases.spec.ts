@@ -1,5 +1,5 @@
 import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
-import type { MembershipRepository } from '../../memberships/domain/membership.repository';
+import type { MemberRepository } from '../../members/domain/member.repository';
 import type { PermissionCatalogRepository } from '../../permissions/domain/permission-catalog.repository';
 import { UnknownPermissionError } from '../../permissions/domain/permission.errors';
 import type { RolePermissionRepository } from '../../permissions/domain/role-permission.repository';
@@ -97,7 +97,7 @@ describe('UpdateRoleUseCase', () => {
 
 describe('DeleteRoleUseCase', () => {
   let roles: jest.Mocked<RoleRepository>;
-  let memberships: { countByRole: jest.Mock };
+  let members: { countByRole: jest.Mock };
   let useCase: DeleteRoleUseCase;
 
   beforeEach(() => {
@@ -108,8 +108,8 @@ describe('DeleteRoleUseCase', () => {
       save: jest.fn(),
       softDelete: jest.fn(),
     };
-    memberships = { countByRole: jest.fn().mockResolvedValue(0) };
-    useCase = new DeleteRoleUseCase(roles, memberships as unknown as MembershipRepository);
+    members = { countByRole: jest.fn().mockResolvedValue(0) };
+    useCase = new DeleteRoleUseCase(roles, members as unknown as MemberRepository);
   });
 
   it('deletes a role with no members', async () => {
@@ -127,9 +127,9 @@ describe('DeleteRoleUseCase', () => {
     expect(roles.softDelete).not.toHaveBeenCalled();
   });
 
-  it('rejects deleting a role in use by a membership', async () => {
+  it('rejects deleting a role in use by a member', async () => {
     roles.findById.mockResolvedValue(role());
-    memberships.countByRole.mockResolvedValue(1);
+    members.countByRole.mockResolvedValue(1);
 
     await expect(useCase.execute('role-1')).rejects.toBeInstanceOf(RoleInUseError);
   });

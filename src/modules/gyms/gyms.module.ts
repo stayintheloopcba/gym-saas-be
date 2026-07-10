@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MembershipsModule } from '../memberships/memberships.module';
+import { MembersModule } from '../members/members.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { StorageModule } from '../storage/storage.module';
 import { CreateGymUseCase } from './application/create-gym.use-case';
@@ -20,11 +20,11 @@ import { OnboardingController } from './interfaces/onboarding.controller';
 import { GymsController } from './interfaces/gyms.controller';
 
 /**
- * Módulo de organizaciones (capas DDD). Importa memberships y permisos. Aloja
- * también el `OnboardingController`, parte de la capacidad `gym-context`.
+ * Módulo de gyms (capas DDD). Importa members y permisos. Aloja también el
+ * `OnboardingController`, parte de la capacidad `gym-context`.
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Gym]), MembershipsModule, PermissionsModule, StorageModule],
+  imports: [TypeOrmModule.forFeature([Gym]), MembersModule, PermissionsModule, StorageModule],
   controllers: [GymsController, OnboardingController],
   providers: [
     { provide: GYM_REPOSITORY, useClass: TypeOrmGymRepository },

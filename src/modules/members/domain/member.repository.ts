@@ -24,9 +24,13 @@ export interface MemberRepository {
   findById(gymId: string, id: string): Promise<Member | null>;
   findByGymAndUserId(gymId: string, userId: string): Promise<Member | null>;
   findByGymAndDocumentId(gymId: string, documentId: string): Promise<Member | null>;
+  /** Todos los Members (de cualquier gym) del usuario, p. ej. para listar "mis gyms". */
+  findByUserId(userId: string): Promise<Member[]>;
   list(gymId: string, filters: MemberListFilters): Promise<Member[]>;
   /** Cantidad de Members activos de un gym con un rol dado (p. ej. contar owners). */
   countByRoleInGym(gymId: string, roleId: string): Promise<number>;
+  /** Cantidad de Members activos (en cualquier gym) que usan un rol dado (para "rol en uso"). */
+  countByRole(roleId: string): Promise<number>;
   save(member: Member): Promise<Member>;
   softDelete(id: string): Promise<void>;
 }

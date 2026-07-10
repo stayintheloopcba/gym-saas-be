@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { MEMBERSHIP_REPOSITORY } from '../../memberships/domain/membership.repository';
-import type { MembershipRepository } from '../../memberships/domain/membership.repository';
+import { MEMBER_REPOSITORY } from '../../members/domain/member.repository';
+import type { MemberRepository } from '../../members/domain/member.repository';
 import { PERMISSION_REPOSITORY } from '../../permissions/domain/permission.repository';
 import type { PermissionRepository } from '../../permissions/domain/permission.repository';
 import { RoleSummary } from '../../permissions/domain/role-summary';
@@ -8,32 +8,32 @@ import { Gym } from '../domain/gym.entity';
 import { GYM_REPOSITORY } from '../domain/gym.repository';
 import type { GymRepository } from '../domain/gym.repository';
 
-/** Una organización del usuario junto con su rol del catálogo en ella. */
+/** Un gym del usuario junto con su rol del catálogo en él. */
 export interface MyGym {
   gym: Gym;
   role: RoleSummary;
 }
 
 /**
- * Lista las organizaciones donde el usuario tiene una membresía activa, con su
- * rol en cada una. Las orgs eliminadas se omiten (el `findById` no las devuelve).
+ * Lista los gyms donde el usuario tiene un `Member` activo, con su rol en
+ * cada uno. Los gyms eliminados se omiten (el `findById` no los devuelve).
  */
 @Injectable()
 export class ListMyGymsUseCase {
   constructor(
     @Inject(GYM_REPOSITORY) private readonly gyms: GymRepository,
-    @Inject(MEMBERSHIP_REPOSITORY) private readonly memberships: MembershipRepository,
+    @Inject(MEMBER_REPOSITORY) private readonly members: MemberRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
   ) {}
 
   async execute(callerUserId: string): Promise<MyGym[]> {
-    const memberships = await this.memberships.findByUser(callerUserId);
+    const members = await this.members.findByUserId(callerUserId);
 
     const result: MyGym[] = [];
-    for (const membership of memberships) {
+    for (const member of members) {
       const [gym, role] = await Promise.all([
-        this.gyms.findById(membership.gymId),
-        this.permissionsRepo.findRoleSummary(membership.roleId),
+        this.gyms.findById(member.gymId),
+        this.permissionsRepo.findRoleSummary(member.roleId),
       ]);
       if (gym && role) {
         result.push({ gym, role });

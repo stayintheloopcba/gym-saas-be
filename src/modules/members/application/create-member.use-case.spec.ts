@@ -15,8 +15,10 @@ describe('CreateMemberUseCase', () => {
       findById: jest.fn(),
       findByGymAndUserId: jest.fn(),
       findByGymAndDocumentId: jest.fn().mockResolvedValue(null),
+      findByUserId: jest.fn(),
       list: jest.fn(),
       countByRoleInGym: jest.fn(),
+      countByRole: jest.fn(),
       save: jest.fn((member: Member) => Promise.resolve(member)),
       softDelete: jest.fn(),
     };
