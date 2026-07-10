@@ -5,6 +5,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index('idx_routine_items_routine', ['routineId'])
 @Entity('routine_items')
 export class RoutineItem extends BaseEntity {
+  @Index()
   @Column({ name: 'gym_id', type: 'uuid' })
   public gymId: string;
 

@@ -9,6 +9,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
  */
 @Index('idx_access_logs_gym_timestamp', ['gymId', 'timestamp'])
 @Index('idx_access_logs_member', ['memberId'])
+@Index('idx_access_logs_gym_branch', ['gymId', 'branchId'])
 @Entity('access_logs')
 export class AccessLog extends BaseEntity {
   @Column({ name: 'gym_id', type: 'uuid' })

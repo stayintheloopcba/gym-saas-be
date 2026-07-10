@@ -22,6 +22,7 @@ import { MemberStatus } from './member-status.enum';
   unique: true,
   where: '"deleted_at" IS NULL AND "document_id" IS NOT NULL',
 })
+@Index('idx_members_gym_branch', ['gymId', 'branchId'])
 @Entity('members')
 export class Member extends BaseEntity {
   @Index()
