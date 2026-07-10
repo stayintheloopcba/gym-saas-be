@@ -45,7 +45,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 19 | `Routines` module | 5 | [x] |
 | 20 | Routine assignments | 19 | [x] |
 | 21 | `Progress` module | 19 | [x] |
-| 22 | Index/constraint pass + OpenAPI + full regression | 8, 9, 14, 17, 18, 20, 21 | [ ] |
+| 22 | Index/constraint pass + OpenAPI + full regression | 8, 9, 14, 17, 18, 20, 21 | [x] |
 | 23 | E2E contract test: full member lifecycle | 22 | [ ] |
 
 <!-- On archive, this file is rewritten as the final summary (same spirit as the
