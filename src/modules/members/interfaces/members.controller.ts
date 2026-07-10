@@ -36,14 +36,18 @@ import { CurrentUser } from '../../auth/interfaces/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/interfaces/jwt-auth.guard';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
 import type { UserPublicProfile } from '../../users/application/user-public-profile';
+import { ChangeMemberRoleUseCase } from '../application/change-member-role.use-case';
 import { CreateMemberUseCase } from '../application/create-member.use-case';
 import { GetMemberUseCase } from '../application/get-member.use-case';
+import { GrantPortalAccessUseCase } from '../application/grant-portal-access.use-case';
 import { ListMembersUseCase } from '../application/list-members.use-case';
 import { RemoveMemberUseCase } from '../application/remove-member.use-case';
 import { UpdateMemberUseCase } from '../application/update-member.use-case';
 import { CreateMemberDto } from './dto/create-member.dto';
+import { LinkUserDto } from './dto/link-user.dto';
 import { ListMembersQueryDto } from './dto/list-members-query.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
+import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
 import { MemberView } from './member.view';
 
 /**
@@ -67,6 +71,8 @@ export class MembersController {
     private readonly getMember: GetMemberUseCase,
     private readonly updateMember: UpdateMemberUseCase,
     private readonly removeMember: RemoveMemberUseCase,
+    private readonly changeMemberRole: ChangeMemberRoleUseCase,
+    private readonly grantPortalAccess: GrantPortalAccessUseCase,
   ) {}
 
   @Post()
@@ -132,6 +138,44 @@ export class MembersController {
     @Body() dto: UpdateMemberDto,
   ): Promise<MemberView> {
     return this.updateMember.execute({ callerUserId: user.id, gymId, memberId, ...dto });
+  }
+
+  @Patch(':memberId/role')
+  @RequirePermissions(PERMISSIONS.MEMBERS_UPDATE_ROLE)
+  @ApiOperation({ summary: "Change a member's role" })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'memberId', format: 'uuid' })
+  @ApiBody({ type: UpdateMemberRoleDto })
+  @ApiOkResponse({ type: MemberModel })
+  @ApiForbiddenResponse({ type: ErrorResponseModel })
+  @ApiNotFoundResponse({ type: ErrorResponseModel })
+  @ApiConflictResponse({ type: ErrorResponseModel })
+  changeRole(
+    @CurrentUser() user: UserPublicProfile,
+    @Param('id', ParseUUIDPipe) gymId: string,
+    @Param('memberId', ParseUUIDPipe) memberId: string,
+    @Body() dto: UpdateMemberRoleDto,
+  ): Promise<MemberView> {
+    return this.changeMemberRole.execute({ callerUserId: user.id, gymId, memberId, roleId: dto.roleId });
+  }
+
+  @Post(':memberId/user')
+  @RequirePermissions(PERMISSIONS.MEMBERS_UPDATE)
+  @ApiOperation({ summary: 'Grant portal access: link an existing account by email, or create one' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'memberId', format: 'uuid' })
+  @ApiBody({ type: LinkUserDto })
+  @ApiOkResponse({ type: MemberModel })
+  @ApiForbiddenResponse({ type: ErrorResponseModel })
+  @ApiNotFoundResponse({ type: ErrorResponseModel })
+  @ApiConflictResponse({ type: ErrorResponseModel })
+  linkUser(
+    @CurrentUser() user: UserPublicProfile,
+    @Param('id', ParseUUIDPipe) gymId: string,
+    @Param('memberId', ParseUUIDPipe) memberId: string,
+    @Body() dto: LinkUserDto,
+  ): Promise<MemberView> {
+    return this.grantPortalAccess.execute({ callerUserId: user.id, gymId, memberId, email: dto.email });
   }
 
   @Delete(':memberId')

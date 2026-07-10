@@ -49,6 +49,10 @@ export class TypeOrmMemberRepository implements MemberRepository {
     return qb.orderBy('member.last_name', 'ASC').addOrderBy('member.first_name', 'ASC').getMany();
   }
 
+  countByRoleInGym(gymId: string, roleId: string): Promise<number> {
+    return this.repo.count({ where: { gymId, roleId } });
+  }
+
   save(member: Member): Promise<Member> {
     return this.repo.save(member);
   }

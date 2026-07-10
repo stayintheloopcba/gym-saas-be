@@ -25,6 +25,8 @@ export interface MemberRepository {
   findByGymAndUserId(gymId: string, userId: string): Promise<Member | null>;
   findByGymAndDocumentId(gymId: string, documentId: string): Promise<Member | null>;
   list(gymId: string, filters: MemberListFilters): Promise<Member[]>;
+  /** Cantidad de Members activos de un gym con un rol dado (p. ej. contar owners). */
+  countByRoleInGym(gymId: string, roleId: string): Promise<number>;
   save(member: Member): Promise<Member>;
   softDelete(id: string): Promise<void>;
 }
