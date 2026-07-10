@@ -9,6 +9,7 @@ import { AuthContextMiddleware } from './common/context/auth-context.middleware'
 import { buildTypeOrmConfig } from './config/database.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { MembersModule } from './modules/members/members.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
 import { GymsModule } from './modules/gyms/gyms.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
@@ -33,6 +34,7 @@ import { UsersModule } from './modules/users/users.module';
     PermissionsModule,
     PlatformAdminModule,
     MembershipsModule,
+    MembersModule,
     RolesModule,
     GymsModule,
     StorageModule,
