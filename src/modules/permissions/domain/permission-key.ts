@@ -3,6 +3,8 @@ export const PERMISSIONS = {
   GYM_UPDATE: 'gym:update',
   GYM_DELETE: 'gym:delete',
   MEMBERS_READ: 'members:read',
+  MEMBERS_CREATE: 'members:create',
+  MEMBERS_UPDATE: 'members:update',
   MEMBERS_UPDATE_ROLE: 'members:update_role',
   MEMBERS_REMOVE: 'members:remove',
   ROLES_READ: 'roles:read',

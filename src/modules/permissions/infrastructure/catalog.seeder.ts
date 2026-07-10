@@ -91,6 +91,8 @@ export class CatalogSeeder implements OnApplicationBootstrap {
         permissions: [
           PERMISSIONS.GYM_READ,
           PERMISSIONS.MEMBERS_READ,
+          PERMISSIONS.MEMBERS_CREATE,
+          PERMISSIONS.MEMBERS_UPDATE,
           PERMISSIONS.SETTINGS_READ,
           PERMISSIONS.ROLES_READ,
           PERMISSIONS.USERS_READ,
@@ -111,6 +113,8 @@ export class CatalogSeeder implements OnApplicationBootstrap {
       'gym:update': { name: 'Update gym', description: 'Update gym details' },
       'gym:delete': { name: 'Delete gym', description: 'Delete a gym' },
       'members:read': { name: 'Read members', description: 'Read gym members' },
+      'members:create': { name: 'Create members', description: 'Register new gym members' },
+      'members:update': { name: 'Update members', description: "Update a member's personal data" },
       'members:update_role': { name: 'Update member roles', description: 'Change member roles' },
       'members:remove': { name: 'Remove members', description: 'Remove gym members' },
       'roles:read': { name: 'Read roles', description: 'Read the role catalog' },

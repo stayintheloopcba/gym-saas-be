@@ -105,6 +105,59 @@ export class GymMemberModel {
   user: UserPublicProfileModel;
 }
 
+export class MemberModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  userId: string | null;
+
+  @ApiProperty({ type: RoleSummaryModel })
+  role: RoleSummaryModel;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  branchId: string | null;
+
+  @ApiProperty({ example: 'Ada' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Lovelace' })
+  lastName: string;
+
+  @ApiProperty({ type: String, nullable: true, example: '30111222' })
+  documentId: string | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'email' })
+  email: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone: string | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'date' })
+  birthDate: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  photoUrl: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  emergencyContactName: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  emergencyContactPhone: string | null;
+
+  @ApiProperty({ enum: ['ACTIVE', 'SUSPENDED', 'OVERDUE', 'INACTIVE'] })
+  status: string;
+
+  @ApiProperty({ type: Object, nullable: true })
+  consents: Record<string, unknown> | null;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
 export class MyPermissionsModel {
   @ApiProperty({ format: 'uuid' })
   gymId: string;

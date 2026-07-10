@@ -11,10 +11,15 @@ import { Membership } from './domain/membership.entity';
 import { MEMBERSHIP_REPOSITORY } from './domain/membership.repository';
 import { TypeOrmMembershipContextAdapter } from './infrastructure/typeorm-membership-context.adapter';
 import { TypeOrmMembershipRepository } from './infrastructure/typeorm-membership.repository';
-import { MembersController } from './interfaces/members.controller';
 
 /**
- * Módulo de memberships (capas DDD: domain / application / infrastructure / interfaces).
+ * Módulo de memberships (capas DDD: domain / application / infrastructure).
+ *
+ * Su antiguo `MembersController` (`gyms/:id/members`) se desmontó al agregar
+ * el nuevo módulo `members`, que sirve esa misma ruta con el modelo `Member`
+ * — ver la nota de la tarea 5 en `4-implementation/gym-saas-be.md`. Las
+ * use cases de abajo quedan sin controller hasta que la tarea 8 borre este
+ * módulo (portando lo que sobreviva, p. ej. la protección de único owner).
  *
  * Vincula `MEMBERSHIP_REPOSITORY` y el `MEMBERSHIP_CONTEXT_PORT` (que consume el
  * `AuthContextMiddleware` en `common` para validar la org activa). Exporta el
@@ -23,7 +28,6 @@ import { MembersController } from './interfaces/members.controller';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([Membership, Member]), UsersModule, PermissionsModule],
-  controllers: [MembersController],
   providers: [
     { provide: MEMBERSHIP_REPOSITORY, useClass: TypeOrmMembershipRepository },
     { provide: MEMBERSHIP_CONTEXT_PORT, useClass: TypeOrmMembershipContextAdapter },
