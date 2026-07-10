@@ -35,7 +35,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 9 | Extend catalog seeder: new permission matrix + `student` role | 2, 3 | [x] |
 | 10 | `GymSettings` module | 1 | [x] |
 | 11 | `Branches` module | 1 | [x] |
-| 12 | `Disciplines` global catalog | 1 | [ ] |
+| 12 | `Disciplines` global catalog | 1 | [x] |
 | 13 | Branch offered-disciplines replace-set | 11, 12 | [ ] |
 | 14 | `Plans` module with branch/discipline joins | 13 | [ ] |
 | 15 | `Subscriptions` module | 5, 14 | [ ] |
