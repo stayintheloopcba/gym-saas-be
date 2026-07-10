@@ -6,7 +6,7 @@ export const REQUIRED_PERMISSIONS_KEY = 'required_permissions';
 
 export interface RequirePermissionsOptions {
   permission: PermissionKey | PermissionKey[];
-  organizationId?: (request: Request) => string | undefined;
+  gymId?: (request: Request) => string | undefined;
   /** `resourceType` a validar por ownership (debe tener un validator registrado). */
   resource?: string;
   /** Extrae el id del recurso desde el request para el chequeo de ownership. */

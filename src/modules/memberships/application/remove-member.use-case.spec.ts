@@ -1,4 +1,4 @@
-import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
+import { GymPermissionService } from '../../permissions/application/gym-permission.service';
 import { PermissionDeniedError } from '../../permissions/domain/permission.errors';
 import { PermissionRepository } from '../../permissions/domain/permission.repository';
 import { RoleSummary } from '../../permissions/domain/role-summary';
@@ -7,13 +7,13 @@ import { SoleOwnerError } from '../domain/membership.errors';
 import { MembershipRepository } from '../domain/membership.repository';
 import { RemoveMemberUseCase } from './remove-member.use-case';
 
-const ORG = 'org-1';
+const GYM = 'gym-1';
 const OWNER: RoleSummary = { id: 'role-owner', key: 'owner', name: 'Dueño' };
 const ADMIN: RoleSummary = { id: 'role-admin', key: 'admin', name: 'Administrador' };
 const ROLES: Record<string, RoleSummary> = { [OWNER.id]: OWNER, [ADMIN.id]: ADMIN };
 
 const membership = (userId: string, roleId: string): Membership =>
-  Object.assign(new Membership(), { id: `m-${userId}`, userId, organizationId: ORG, roleId });
+  Object.assign(new Membership(), { id: `m-${userId}`, userId, gymId: GYM, roleId });
 
 describe('RemoveMemberUseCase', () => {
   let memberships: jest.Mocked<MembershipRepository>;
@@ -36,7 +36,7 @@ describe('RemoveMemberUseCase', () => {
     useCase = new RemoveMemberUseCase(
       memberships,
       permissionsRepo as unknown as PermissionRepository,
-      permissions as unknown as OrganizationPermissionService,
+      permissions as unknown as GymPermissionService,
     );
   });
 
@@ -45,7 +45,7 @@ describe('RemoveMemberUseCase', () => {
       Promise.resolve(userId === 'admin' ? membership('admin', ADMIN.id) : membership('bob', ADMIN.id)),
     );
 
-    await useCase.execute({ callerUserId: 'admin', organizationId: ORG, targetUserId: 'bob' });
+    await useCase.execute({ callerUserId: 'admin', gymId: GYM, targetUserId: 'bob' });
 
     expect(memberships.softDelete).toHaveBeenCalledWith('m-bob');
   });
@@ -54,9 +54,9 @@ describe('RemoveMemberUseCase', () => {
     memberships.findByUserAndOrg.mockResolvedValue(membership('owner', OWNER.id));
     memberships.countByRoleInOrg.mockResolvedValue(1);
 
-    await expect(
-      useCase.execute({ callerUserId: 'owner', organizationId: ORG, targetUserId: 'owner' }),
-    ).rejects.toBeInstanceOf(SoleOwnerError);
+    await expect(useCase.execute({ callerUserId: 'owner', gymId: GYM, targetUserId: 'owner' })).rejects.toBeInstanceOf(
+      SoleOwnerError,
+    );
     expect(memberships.softDelete).not.toHaveBeenCalled();
   });
 
@@ -64,7 +64,7 @@ describe('RemoveMemberUseCase', () => {
     memberships.findByUserAndOrg.mockResolvedValue(membership('owner', OWNER.id));
     memberships.countByRoleInOrg.mockResolvedValue(2);
 
-    await useCase.execute({ callerUserId: 'other-owner', organizationId: ORG, targetUserId: 'owner' });
+    await useCase.execute({ callerUserId: 'other-owner', gymId: GYM, targetUserId: 'owner' });
 
     expect(memberships.softDelete).toHaveBeenCalledWith('m-owner');
   });
@@ -72,9 +72,9 @@ describe('RemoveMemberUseCase', () => {
   it('rejects a member without privilege', async () => {
     permissions.requirePermission.mockRejectedValue(new PermissionDeniedError());
 
-    await expect(
-      useCase.execute({ callerUserId: 'member', organizationId: ORG, targetUserId: 'bob' }),
-    ).rejects.toBeInstanceOf(PermissionDeniedError);
+    await expect(useCase.execute({ callerUserId: 'member', gymId: GYM, targetUserId: 'bob' })).rejects.toBeInstanceOf(
+      PermissionDeniedError,
+    );
     expect(memberships.softDelete).not.toHaveBeenCalled();
   });
 });

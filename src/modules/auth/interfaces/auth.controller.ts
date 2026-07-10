@@ -27,7 +27,7 @@ import { ErrorResponseModel, SuccessResponseModel, UserPublicProfileModel } from
 import { ACCESS_TOKEN_SECURITY, REFRESH_TOKEN_SECURITY } from '../../../config/openapi.config';
 import type { UserPublicProfile } from '../../users/application/user-public-profile';
 import { AuthResult } from '../application/auth-result';
-import { ActiveOrgCookie } from '../../organizations/interfaces/active-org-cookie';
+import { ActiveGymCookie } from '../../gyms/interfaces/active-gym-cookie';
 import { GoogleAuthUseCase, GoogleProfile } from '../application/google-auth.use-case';
 import { LoginUseCase } from '../application/login.use-case';
 import { LogoutUseCase } from '../application/logout.use-case';
@@ -55,7 +55,7 @@ export class AuthController {
     private readonly refreshUseCase: RefreshTokenUseCase,
     private readonly googleAuthUseCase: GoogleAuthUseCase,
     private readonly cookies: AuthCookies,
-    private readonly activeOrgCookie: ActiveOrgCookie,
+    private readonly activeGymCookie: ActiveGymCookie,
     private readonly config: ConfigService,
   ) {}
 
@@ -152,8 +152,8 @@ export class AuthController {
   /** Setea las cookies de sesión (y la de org activa, si la hay) y devuelve el perfil. */
   private completeAuth(result: AuthResult, res: Response): UserPublicProfile {
     this.cookies.setSessionCookies(res, result.tokens);
-    if (result.activeOrganizationId) {
-      this.activeOrgCookie.set(res, result.activeOrganizationId);
+    if (result.activeGymId) {
+      this.activeGymCookie.set(res, result.activeGymId);
     }
     return result.user;
   }

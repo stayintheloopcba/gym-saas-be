@@ -37,7 +37,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
       durationMs: Math.max(0, Date.now() - startedAt),
       outcome,
       accountId: requestContext?.accountId,
-      activeOrganizationId: requestContext?.activeOrganizationId,
+      activeGymId: requestContext?.activeGymId,
     });
   }
 

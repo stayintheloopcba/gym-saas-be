@@ -9,7 +9,7 @@ export interface HttpRequestLog {
   durationMs: number;
   outcome: 'success' | 'error';
   accountId?: string;
-  activeOrganizationId?: string;
+  activeGymId?: string;
 }
 
 export interface HttpErrorLog {
@@ -21,7 +21,7 @@ export interface HttpErrorLog {
   errorType: string;
   message: string;
   accountId?: string;
-  activeOrganizationId?: string;
+  activeGymId?: string;
 }
 
 /**

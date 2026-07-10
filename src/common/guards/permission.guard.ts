@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { REQUIRED_PERMISSIONS_KEY, RequirePermissionsOptions } from '../decorators/require-permissions.decorator';
 import { AuthContextService } from '../context/auth-context.service';
-import { OrganizationPermissionService } from '../../modules/permissions/application/organization-permission.service';
+import { GymPermissionService } from '../../modules/permissions/application/gym-permission.service';
 import { OwnershipContextService } from '../../modules/permissions/application/ownership-context.service';
 import { PermissionKey } from '../../modules/permissions/domain/permission-key';
 import { OwnershipValidatorRegistry } from '../../modules/permissions/ownership/ownership-validator-registry';
@@ -14,7 +14,7 @@ export class PermissionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly authContext: AuthContextService,
-    private readonly permissions: OrganizationPermissionService,
+    private readonly permissions: GymPermissionService,
     private readonly ownershipContext: OwnershipContextService,
     private readonly ownershipValidators: OwnershipValidatorRegistry,
   ) {}
@@ -30,19 +30,19 @@ export class PermissionGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     const principal = request.user as AuthenticatedPrincipal | undefined;
-    const pathOrganizationId = request.params?.id;
-    const organizationId =
-      options.organizationId?.(request) ??
-      (Array.isArray(pathOrganizationId) ? pathOrganizationId[0] : pathOrganizationId) ??
-      this.authContext.getActiveOrganizationId();
-    if (!principal?.user.id || !organizationId) {
-      throw new ForbiddenException('An active organization is required');
+    const pathGymId = request.params?.id;
+    const gymId =
+      options.gymId?.(request) ??
+      (Array.isArray(pathGymId) ? pathGymId[0] : pathGymId) ??
+      this.authContext.getActiveGymId();
+    if (!principal?.user.id || !gymId) {
+      throw new ForbiddenException('An active gym is required');
     }
 
     const userId = principal.user.id;
     const hasPermission = await this.permissions.checkPermission(
       userId,
-      organizationId,
+      gymId,
       options.permission as PermissionKey | PermissionKey[],
     );
     if (!hasPermission) {
@@ -50,7 +50,7 @@ export class PermissionGuard implements CanActivate {
     }
 
     if (options.resource && options.resourceId && !options.skipOwnership) {
-      await this.checkOwnership(request, options, userId, organizationId);
+      await this.checkOwnership(request, options, userId, gymId);
     }
 
     return true;
@@ -60,7 +60,7 @@ export class PermissionGuard implements CanActivate {
     request: Request,
     options: RequirePermissionsOptions,
     userId: string,
-    organizationId: string,
+    gymId: string,
   ): Promise<void> {
     const resourceId = options.resourceId?.(request);
     if (!resourceId) {
@@ -73,9 +73,9 @@ export class PermissionGuard implements CanActivate {
       throw new ForbiddenException('No ownership validator registered for this resource');
     }
 
-    const ownershipContext = await this.ownershipContext.build(userId, organizationId);
+    const ownershipContext = await this.ownershipContext.build(userId, gymId);
     if (!ownershipContext) {
-      throw new ForbiddenException('An active organization is required');
+      throw new ForbiddenException('An active gym is required');
     }
 
     const result = await validator.validate(resourceId, ownershipContext);

@@ -11,12 +11,12 @@ import { OwnershipContext } from '../ownership/ownership-context';
 export class OwnershipContextService {
   constructor(@Inject(PERMISSION_REPOSITORY) private readonly permissions: PermissionRepository) {}
 
-  async build(userId: string, organizationId: string): Promise<OwnershipContext | null> {
-    const membershipRole = await this.permissions.findMembershipRole(userId, organizationId);
+  async build(userId: string, gymId: string): Promise<OwnershipContext | null> {
+    const membershipRole = await this.permissions.findMembershipRole(userId, gymId);
     if (!membershipRole) {
       return null;
     }
 
-    return { userId, organizationId, hierarchyLevel: membershipRole.hierarchyLevel };
+    return { userId, gymId, hierarchyLevel: membershipRole.hierarchyLevel };
   }
 }

@@ -64,7 +64,7 @@ describe('AllExceptionsFilter', () => {
   });
 
   it('maps a TypeORM QueryFailedError (generic) to 500', () => {
-    authContextStorage.run({ requestId: 'request-500', accountId: 'user-1', activeOrganizationId: 'org-1' }, () =>
+    authContextStorage.run({ requestId: 'request-500', accountId: 'user-1', activeGymId: 'gym-1' }, () =>
       filter.catch(new QueryFailedError('SELECT 1', [], new Error('boom')), host),
     );
 
@@ -77,7 +77,7 @@ describe('AllExceptionsFilter', () => {
         path: '/test',
         statusCode: 500,
         accountId: 'user-1',
-        activeOrganizationId: 'org-1',
+        activeGymId: 'gym-1',
       }),
       expect.any(String),
     );

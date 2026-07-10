@@ -1,5 +1,5 @@
 import { AuthProvider } from '../../../common/enums/auth-provider.enum';
-import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
+import { GymPermissionService } from '../../permissions/application/gym-permission.service';
 import { PermissionDeniedError } from '../../permissions/domain/permission.errors';
 import { PermissionRepository } from '../../permissions/domain/permission.repository';
 import { RoleSummary } from '../../permissions/domain/role-summary';
@@ -16,7 +16,7 @@ import {
 import { MembershipRepository } from '../domain/membership.repository';
 import { ChangeMemberRoleUseCase } from './change-member-role.use-case';
 
-const ORG = 'org-1';
+const GYM = 'gym-1';
 
 const OWNER: RoleSummary = { id: 'role-owner', key: 'owner', name: 'Dueño' };
 const ADMIN: RoleSummary = { id: 'role-admin', key: 'admin', name: 'Administrador' };
@@ -24,7 +24,7 @@ const INSTRUCTOR: RoleSummary = { id: 'role-instructor', key: 'instructor', name
 const ROLES: Record<string, RoleSummary> = { [OWNER.id]: OWNER, [ADMIN.id]: ADMIN, [INSTRUCTOR.id]: INSTRUCTOR };
 
 const membership = (userId: string, roleId: string): Membership =>
-  Object.assign(new Membership(), { id: `m-${userId}`, userId, organizationId: ORG, roleId });
+  Object.assign(new Membership(), { id: `m-${userId}`, userId, gymId: GYM, roleId });
 
 const user = (id: string): User =>
   Object.assign(new User(), {
@@ -60,7 +60,7 @@ describe('ChangeMemberRoleUseCase', () => {
     useCase = new ChangeMemberRoleUseCase(
       memberships,
       permissionsRepo as unknown as PermissionRepository,
-      permissions as unknown as OrganizationPermissionService,
+      permissions as unknown as GymPermissionService,
       findUserById as unknown as FindUserByIdUseCase,
     );
     for (const key of Object.keys(members)) {
@@ -74,7 +74,7 @@ describe('ChangeMemberRoleUseCase', () => {
 
     const result = await useCase.execute({
       callerUserId: 'owner',
-      organizationId: ORG,
+      gymId: GYM,
       targetUserId: 'bob',
       roleId: ADMIN.id,
     });
@@ -87,7 +87,7 @@ describe('ChangeMemberRoleUseCase', () => {
     members.admin = membership('admin', ADMIN.id);
 
     await expect(
-      useCase.execute({ callerUserId: 'admin', organizationId: ORG, targetUserId: 'admin', roleId: INSTRUCTOR.id }),
+      useCase.execute({ callerUserId: 'admin', gymId: GYM, targetUserId: 'admin', roleId: INSTRUCTOR.id }),
     ).rejects.toBeInstanceOf(CannotChangeOwnRoleError);
     expect(memberships.save).not.toHaveBeenCalled();
   });
@@ -96,7 +96,7 @@ describe('ChangeMemberRoleUseCase', () => {
     members.admin = membership('admin', ADMIN.id);
 
     await expect(
-      useCase.execute({ callerUserId: 'admin', organizationId: ORG, targetUserId: 'bob', roleId: 'ghost-role' }),
+      useCase.execute({ callerUserId: 'admin', gymId: GYM, targetUserId: 'bob', roleId: 'ghost-role' }),
     ).rejects.toBeInstanceOf(UnknownRoleError);
     expect(memberships.save).not.toHaveBeenCalled();
   });
@@ -105,7 +105,7 @@ describe('ChangeMemberRoleUseCase', () => {
     members.admin = membership('admin', ADMIN.id);
 
     await expect(
-      useCase.execute({ callerUserId: 'admin', organizationId: ORG, targetUserId: 'bob', roleId: OWNER.id }),
+      useCase.execute({ callerUserId: 'admin', gymId: GYM, targetUserId: 'bob', roleId: OWNER.id }),
     ).rejects.toBeInstanceOf(OwnerRoleNotAssignableError);
     expect(memberships.save).not.toHaveBeenCalled();
   });
@@ -116,7 +116,7 @@ describe('ChangeMemberRoleUseCase', () => {
     memberships.countByRoleInOrg.mockResolvedValue(1);
 
     await expect(
-      useCase.execute({ callerUserId: 'admin', organizationId: ORG, targetUserId: 'owner', roleId: ADMIN.id }),
+      useCase.execute({ callerUserId: 'admin', gymId: GYM, targetUserId: 'owner', roleId: ADMIN.id }),
     ).rejects.toBeInstanceOf(SoleOwnerError);
     expect(memberships.save).not.toHaveBeenCalled();
   });
@@ -128,7 +128,7 @@ describe('ChangeMemberRoleUseCase', () => {
 
     const result = await useCase.execute({
       callerUserId: 'admin',
-      organizationId: ORG,
+      gymId: GYM,
       targetUserId: 'owner',
       roleId: ADMIN.id,
     });
@@ -140,7 +140,7 @@ describe('ChangeMemberRoleUseCase', () => {
     members.admin = membership('admin', ADMIN.id);
 
     await expect(
-      useCase.execute({ callerUserId: 'admin', organizationId: ORG, targetUserId: 'ghost', roleId: INSTRUCTOR.id }),
+      useCase.execute({ callerUserId: 'admin', gymId: GYM, targetUserId: 'ghost', roleId: INSTRUCTOR.id }),
     ).rejects.toBeInstanceOf(MembershipNotFoundError);
   });
 
@@ -148,7 +148,7 @@ describe('ChangeMemberRoleUseCase', () => {
     permissions.requirePermission.mockRejectedValue(new PermissionDeniedError());
 
     await expect(
-      useCase.execute({ callerUserId: 'member', organizationId: ORG, targetUserId: 'bob', roleId: INSTRUCTOR.id }),
+      useCase.execute({ callerUserId: 'member', gymId: GYM, targetUserId: 'bob', roleId: INSTRUCTOR.id }),
     ).rejects.toBeInstanceOf(PermissionDeniedError);
     expect(memberships.save).not.toHaveBeenCalled();
   });

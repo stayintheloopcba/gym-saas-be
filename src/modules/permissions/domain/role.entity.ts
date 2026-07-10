@@ -3,7 +3,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 
 /**
  * Rol del catálogo global. Compartido por todas las organizaciones: no lleva
- * `organizationId`. `key` es un slug kebab-case estable e inmutable (p. ej.
+ * `gymId`. `key` es un slug kebab-case estable e inmutable (p. ej.
  * `owner`) que el código usa para referenciar roles conocidos sin un enum.
  */
 @Index('uq_roles_key_active', ['key'], {

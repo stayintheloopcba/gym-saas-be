@@ -12,10 +12,10 @@ export interface AuthContext {
 
   /**
    * Organización activa del request. Solo se setea cuando el middleware confirmó
-   * que el usuario tiene una membresía activa en ella (la cookie `active_org`
+   * que el usuario tiene una membresía activa en ella (la cookie `active_gym`
    * nunca se confía por sí sola). Ausente = sin organización activa.
    */
-  activeOrganizationId?: string;
+  activeGymId?: string;
 }
 
 /**

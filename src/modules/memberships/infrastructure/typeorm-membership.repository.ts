@@ -16,20 +16,20 @@ import { MembershipRepository } from '../domain/membership.repository';
 export class TypeOrmMembershipRepository implements MembershipRepository {
   constructor(@InjectRepository(Membership) private readonly repo: Repository<Membership>) {}
 
-  findByUserAndOrg(userId: string, organizationId: string): Promise<Membership | null> {
-    return this.repo.findOne({ where: { userId, organizationId } });
+  findByUserAndOrg(userId: string, gymId: string): Promise<Membership | null> {
+    return this.repo.findOne({ where: { userId, gymId } });
   }
 
   findByUser(userId: string): Promise<Membership[]> {
     return this.repo.find({ where: { userId } });
   }
 
-  findByOrg(organizationId: string): Promise<Membership[]> {
-    return this.repo.find({ where: { organizationId } });
+  findByOrg(gymId: string): Promise<Membership[]> {
+    return this.repo.find({ where: { gymId } });
   }
 
-  countByRoleInOrg(organizationId: string, roleId: string): Promise<number> {
-    return this.repo.count({ where: { organizationId, roleId } });
+  countByRoleInOrg(gymId: string, roleId: string): Promise<number> {
+    return this.repo.count({ where: { gymId, roleId } });
   }
 
   countByRole(roleId: string): Promise<number> {

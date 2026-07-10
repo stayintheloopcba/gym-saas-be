@@ -4,7 +4,7 @@ import { MEMBERSHIP_CONTEXT_PORT } from '../../common/context/membership-context
 import { UsersModule } from '../users/users.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { ChangeMemberRoleUseCase } from './application/change-member-role.use-case';
-import { ListOrganizationMembersUseCase } from './application/list-organization-members.use-case';
+import { ListGymMembersUseCase } from './application/list-gym-members.use-case';
 import { RemoveMemberUseCase } from './application/remove-member.use-case';
 import { Membership } from './domain/membership.entity';
 import { MEMBERSHIP_REPOSITORY } from './domain/membership.repository';
@@ -26,7 +26,7 @@ import { MembersController } from './interfaces/members.controller';
   providers: [
     { provide: MEMBERSHIP_REPOSITORY, useClass: TypeOrmMembershipRepository },
     { provide: MEMBERSHIP_CONTEXT_PORT, useClass: TypeOrmMembershipContextAdapter },
-    ListOrganizationMembersUseCase,
+    ListGymMembersUseCase,
     RemoveMemberUseCase,
     ChangeMemberRoleUseCase,
   ],

@@ -3,7 +3,7 @@ export const FILE_STORAGE = Symbol('FILE_STORAGE');
 
 /** Archivo a almacenar: contenido binario + metadatos mínimos. */
 export interface StorableFile {
-  /** Key/ruta del objeto dentro del bucket (p. ej. `org/<id>/logo-<uuid>.png`). */
+  /** Key/ruta del objeto dentro del bucket (p. ej. `gym/<id>/logo-<uuid>.png`). */
   key: string;
   /** Contenido binario del archivo. */
   buffer: Buffer;

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
+import { GymPermissionService } from '../../permissions/application/gym-permission.service';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
 import { PERMISSION_REPOSITORY } from '../../permissions/domain/permission.repository';
 import type { PermissionRepository } from '../../permissions/domain/permission.repository';
@@ -11,7 +11,7 @@ const OWNER_ROLE_KEY = 'owner';
 
 export interface RemoveMemberCommand {
   callerUserId: string;
-  organizationId: string;
+  gymId: string;
   targetUserId: string;
 }
 
@@ -26,22 +26,22 @@ export class RemoveMemberUseCase {
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY) private readonly memberships: MembershipRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
-    private readonly permissions: OrganizationPermissionService,
+    private readonly permissions: GymPermissionService,
   ) {}
 
   async execute(command: RemoveMemberCommand): Promise<void> {
-    const { callerUserId, organizationId, targetUserId } = command;
+    const { callerUserId, gymId, targetUserId } = command;
 
-    await this.permissions.requirePermission(callerUserId, organizationId, PERMISSIONS.MEMBERS_REMOVE);
+    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.MEMBERS_REMOVE);
 
-    const target = await this.memberships.findByUserAndOrg(targetUserId, organizationId);
+    const target = await this.memberships.findByUserAndOrg(targetUserId, gymId);
     if (!target) {
-      throw new MembershipNotFoundError(`${targetUserId}@${organizationId}`);
+      throw new MembershipNotFoundError(`${targetUserId}@${gymId}`);
     }
 
     const role = await this.permissionsRepo.findRoleSummary(target.roleId);
     if (role?.key === OWNER_ROLE_KEY) {
-      const owners = await this.memberships.countByRoleInOrg(organizationId, target.roleId);
+      const owners = await this.memberships.countByRoleInOrg(gymId, target.roleId);
       if (owners <= 1) {
         throw new SoleOwnerError();
       }

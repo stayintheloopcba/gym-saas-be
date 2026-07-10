@@ -18,7 +18,7 @@ export interface MembershipRoleInfo {
  */
 export interface PermissionRepository {
   /** Rol del catálogo de la membresía del usuario en la organización, o `null` si no es miembro. */
-  findMembershipRole(userId: string, organizationId: string): Promise<MembershipRoleInfo | null>;
+  findMembershipRole(userId: string, gymId: string): Promise<MembershipRoleInfo | null>;
   /** Códigos de permiso otorgados a un rol. */
   findPermissionCodes(roleId: string): Promise<string[]>;
   /** Forma resumida de un rol del catálogo, o `null` si no existe. */

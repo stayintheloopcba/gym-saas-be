@@ -3,7 +3,7 @@ import { IsIn, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class
 import { HierarchyLevel } from '../../../../common/enums/hierarchy-level.enum';
 
 /** Alcance de datos asignable a un rol nuevo: nunca `GLOBAL` (reservado a platform admins). */
-const ASSIGNABLE_HIERARCHY_LEVELS = [HierarchyLevel.SELF, HierarchyLevel.ORGANIZATION];
+const ASSIGNABLE_HIERARCHY_LEVELS = [HierarchyLevel.SELF, HierarchyLevel.GYM];
 
 export class CreateRoleDto {
   @ApiProperty({
@@ -29,7 +29,7 @@ export class CreateRoleDto {
   @MaxLength(255)
   description?: string;
 
-  @ApiProperty({ enum: ASSIGNABLE_HIERARCHY_LEVELS, example: HierarchyLevel.ORGANIZATION })
+  @ApiProperty({ enum: ASSIGNABLE_HIERARCHY_LEVELS, example: HierarchyLevel.GYM })
   @IsIn(ASSIGNABLE_HIERARCHY_LEVELS)
   hierarchyLevel: HierarchyLevel;
 }

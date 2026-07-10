@@ -46,7 +46,7 @@ describe('CreateRoleUseCase', () => {
     const result = await useCase.execute({
       key: 'billing-manager',
       name: 'Billing manager',
-      hierarchyLevel: HierarchyLevel.ORGANIZATION,
+      hierarchyLevel: HierarchyLevel.GYM,
     });
 
     expect(result.key).toBe('billing-manager');

@@ -16,8 +16,8 @@ export class TypeOrmPermissionRepository implements PermissionRepository {
     @InjectRepository(RolePermission) private readonly rolePermissions: Repository<RolePermission>,
   ) {}
 
-  async findMembershipRole(userId: string, organizationId: string): Promise<MembershipRoleInfo | null> {
-    const membership = await this.memberships.findOne({ where: { userId, organizationId } });
+  async findMembershipRole(userId: string, gymId: string): Promise<MembershipRoleInfo | null> {
+    const membership = await this.memberships.findOne({ where: { userId, gymId } });
     if (!membership) {
       return null;
     }

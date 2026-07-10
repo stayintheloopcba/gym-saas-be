@@ -7,8 +7,8 @@ import { DomainError } from '../../../common/errors/domain-error';
 export class DuplicateMembershipError extends DomainError {
   readonly status = 409;
 
-  constructor(userId: string, organizationId: string) {
-    super(`User ${userId} already has a membership in organization ${organizationId}`);
+  constructor(userId: string, gymId: string) {
+    super(`User ${userId} already has a membership in gym ${gymId}`);
   }
 }
 
@@ -25,7 +25,7 @@ export class SoleOwnerError extends DomainError {
   readonly status = 409;
 
   constructor() {
-    super('The sole owner of an organization cannot be removed or demoted');
+    super('The sole owner of an gym cannot be removed or demoted');
   }
 }
 

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionGuard } from '../../common/guards/permission.guard';
 import { Membership } from '../memberships/domain/membership.entity';
-import { OrganizationPermissionService } from './application/organization-permission.service';
+import { GymPermissionService } from './application/gym-permission.service';
 import { OwnershipContextService } from './application/ownership-context.service';
 import { Permission } from './domain/permission.entity';
 import { PERMISSION_CATALOG_REPOSITORY } from './domain/permission-catalog.repository';
@@ -22,14 +22,14 @@ import { OwnershipValidatorRegistry } from './ownership/ownership-validator-regi
     { provide: PERMISSION_REPOSITORY, useClass: TypeOrmPermissionRepository },
     { provide: ROLE_PERMISSION_REPOSITORY, useClass: TypeOrmRolePermissionRepository },
     { provide: PERMISSION_CATALOG_REPOSITORY, useClass: TypeOrmPermissionCatalogRepository },
-    OrganizationPermissionService,
+    GymPermissionService,
     OwnershipContextService,
     OwnershipValidatorRegistry,
     CatalogSeeder,
     PermissionGuard,
   ],
   exports: [
-    OrganizationPermissionService,
+    GymPermissionService,
     OwnershipContextService,
     OwnershipValidatorRegistry,
     PermissionGuard,

@@ -49,7 +49,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           errorType: exception instanceof Error ? exception.name : 'UnknownError',
           message: this.stringify(message),
           accountId: requestContext?.accountId,
-          activeOrganizationId: requestContext?.activeOrganizationId,
+          activeGymId: requestContext?.activeGymId,
         },
         exception instanceof Error ? exception.stack : undefined,
       );

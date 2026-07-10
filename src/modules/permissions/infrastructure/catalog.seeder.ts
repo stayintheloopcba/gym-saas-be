@@ -77,17 +77,17 @@ export class CatalogSeeder implements OnApplicationBootstrap {
     const allExceptOrgDelete = ALL_PERMISSIONS.filter((code) => code !== PERMISSIONS.ORGANIZATION_DELETE);
 
     return [
-      { key: 'owner', name: 'Dueño', hierarchyLevel: HierarchyLevel.ORGANIZATION, permissions: ALL_PERMISSIONS },
+      { key: 'owner', name: 'Dueño', hierarchyLevel: HierarchyLevel.GYM, permissions: ALL_PERMISSIONS },
       {
         key: 'admin',
         name: 'Administrador',
-        hierarchyLevel: HierarchyLevel.ORGANIZATION,
+        hierarchyLevel: HierarchyLevel.GYM,
         permissions: allExceptOrgDelete,
       },
       {
         key: 'receptionist',
         name: 'Recepcionista',
-        hierarchyLevel: HierarchyLevel.ORGANIZATION,
+        hierarchyLevel: HierarchyLevel.GYM,
         permissions: [
           PERMISSIONS.ORGANIZATION_READ,
           PERMISSIONS.MEMBERS_READ,
@@ -112,7 +112,7 @@ export class CatalogSeeder implements OnApplicationBootstrap {
       'organization:delete': { name: 'Delete organization', description: 'Delete an organization' },
       'members:read': { name: 'Read members', description: 'Read organization members' },
       'members:update_role': { name: 'Update member roles', description: 'Change member roles' },
-      'members:remove': { name: 'Remove members', description: 'Remove organization members' },
+      'members:remove': { name: 'Remove members', description: 'Remove gym members' },
       'roles:read': { name: 'Read roles', description: 'Read the role catalog' },
       'users:read': { name: 'Read users', description: 'Read user profiles' },
       'settings:read': { name: 'Read settings', description: 'Read organization settings' },

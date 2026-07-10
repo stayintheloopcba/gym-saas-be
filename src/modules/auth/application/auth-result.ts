@@ -10,8 +10,8 @@ export interface AuthResult {
   user: UserPublicProfile;
   tokens: TokenPair;
   /**
-   * Organización a marcar como activa tras autenticar (cookie `active_org`).
+   * Organización a marcar como activa tras autenticar (cookie `active_gym`).
    * La setea el registro self-serve, que provisiona una org junto al usuario.
    */
-  activeOrganizationId?: string;
+  activeGymId?: string;
 }

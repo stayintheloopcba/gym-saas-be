@@ -25,14 +25,14 @@ describe('TypeOrmPermissionRepository', () => {
   it('returns null when the user has no active membership', async () => {
     memberships.findOne.mockResolvedValue(null);
 
-    await expect(repository.findMembershipRole('user-1', 'org-1')).resolves.toBeNull();
+    await expect(repository.findMembershipRole('user-1', 'gym-1')).resolves.toBeNull();
   });
 
   it('returns null when the membership references a role that no longer exists', async () => {
     memberships.findOne.mockResolvedValue({ roleId: 'role-1' });
     roles.findOne.mockResolvedValue(null);
 
-    await expect(repository.findMembershipRole('user-1', 'org-1')).resolves.toBeNull();
+    await expect(repository.findMembershipRole('user-1', 'gym-1')).resolves.toBeNull();
   });
 
   it('returns the catalog role assigned to the membership', async () => {
@@ -41,14 +41,14 @@ describe('TypeOrmPermissionRepository', () => {
       id: 'role-1',
       key: 'admin',
       name: 'Administrador',
-      hierarchyLevel: HierarchyLevel.ORGANIZATION,
+      hierarchyLevel: HierarchyLevel.GYM,
     });
 
-    await expect(repository.findMembershipRole('user-1', 'org-1')).resolves.toEqual({
+    await expect(repository.findMembershipRole('user-1', 'gym-1')).resolves.toEqual({
       roleId: 'role-1',
       roleKey: 'admin',
       roleName: 'Administrador',
-      hierarchyLevel: HierarchyLevel.ORGANIZATION,
+      hierarchyLevel: HierarchyLevel.GYM,
     });
   });
 

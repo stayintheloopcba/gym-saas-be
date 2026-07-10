@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { OrganizationPermissionService } from '../../permissions/application/organization-permission.service';
+import { GymPermissionService } from '../../permissions/application/gym-permission.service';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
 import { PERMISSION_REPOSITORY } from '../../permissions/domain/permission.repository';
 import type { PermissionRepository } from '../../permissions/domain/permission.repository';
@@ -15,13 +15,13 @@ import {
 } from '../domain/membership.errors';
 import { MEMBERSHIP_REPOSITORY } from '../domain/membership.repository';
 import type { MembershipRepository } from '../domain/membership.repository';
-import { OrganizationMember } from './list-organization-members.use-case';
+import { GymMember } from './list-gym-members.use-case';
 
 const OWNER_ROLE_KEY = 'owner';
 
 export interface ChangeMemberRoleCommand {
   callerUserId: string;
-  organizationId: string;
+  gymId: string;
   targetUserId: string;
   roleId: string;
 }
@@ -42,14 +42,14 @@ export class ChangeMemberRoleUseCase {
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY) private readonly memberships: MembershipRepository,
     @Inject(PERMISSION_REPOSITORY) private readonly permissionsRepo: PermissionRepository,
-    private readonly permissions: OrganizationPermissionService,
+    private readonly permissions: GymPermissionService,
     private readonly findUserById: FindUserByIdUseCase,
   ) {}
 
-  async execute(command: ChangeMemberRoleCommand): Promise<OrganizationMember> {
-    const { callerUserId, organizationId, targetUserId, roleId } = command;
+  async execute(command: ChangeMemberRoleCommand): Promise<GymMember> {
+    const { callerUserId, gymId, targetUserId, roleId } = command;
 
-    await this.permissions.requirePermission(callerUserId, organizationId, PERMISSIONS.MEMBERS_UPDATE_ROLE);
+    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.MEMBERS_UPDATE_ROLE);
 
     if (callerUserId === targetUserId) {
       throw new CannotChangeOwnRoleError();
@@ -63,9 +63,9 @@ export class ChangeMemberRoleUseCase {
       throw new OwnerRoleNotAssignableError();
     }
 
-    const target = await this.memberships.findByUserAndOrg(targetUserId, organizationId);
+    const target = await this.memberships.findByUserAndOrg(targetUserId, gymId);
     if (!target) {
-      throw new MembershipNotFoundError(`${targetUserId}@${organizationId}`);
+      throw new MembershipNotFoundError(`${targetUserId}@${gymId}`);
     }
 
     if (target.roleId === role.id) {
@@ -74,7 +74,7 @@ export class ChangeMemberRoleUseCase {
 
     const currentRole = await this.permissionsRepo.findRoleSummary(target.roleId);
     if (currentRole?.key === OWNER_ROLE_KEY) {
-      const owners = await this.memberships.countByRoleInOrg(organizationId, target.roleId);
+      const owners = await this.memberships.countByRoleInOrg(gymId, target.roleId);
       if (owners <= 1) {
         throw new SoleOwnerError();
       }
@@ -85,7 +85,7 @@ export class ChangeMemberRoleUseCase {
     return this.toMember(saved, role);
   }
 
-  private async toMember(membership: { id: string; userId: string }, role: RoleSummary): Promise<OrganizationMember> {
+  private async toMember(membership: { id: string; userId: string }, role: RoleSummary): Promise<GymMember> {
     const user = await this.findUserById.execute(membership.userId);
     if (!user) {
       throw new MembershipNotFoundError(`${membership.userId}@membership`);

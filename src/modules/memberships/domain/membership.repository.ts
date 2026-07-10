@@ -17,11 +17,11 @@ export const MEMBERSHIP_REPOSITORY = Symbol('MEMBERSHIP_REPOSITORY');
  * atómica de org + membresía owner) sin acoplar la aplicación a TypeORM.
  */
 export interface MembershipRepository {
-  findByUserAndOrg(userId: string, organizationId: string): Promise<Membership | null>;
+  findByUserAndOrg(userId: string, gymId: string): Promise<Membership | null>;
   findByUser(userId: string): Promise<Membership[]>;
-  findByOrg(organizationId: string): Promise<Membership[]>;
+  findByOrg(gymId: string): Promise<Membership[]>;
   /** Cantidad de membresías activas de una organización que tienen un rol dado (p. ej. contar owners). */
-  countByRoleInOrg(organizationId: string, roleId: string): Promise<number>;
+  countByRoleInOrg(gymId: string, roleId: string): Promise<number>;
   /** Cantidad de membresías activas (en cualquier organización) que usan un rol dado (para "rol en uso"). */
   countByRole(roleId: string): Promise<number>;
   save(membership: Membership, manager?: EntityManager): Promise<Membership>;

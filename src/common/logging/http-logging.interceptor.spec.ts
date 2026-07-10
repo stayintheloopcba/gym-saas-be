@@ -39,7 +39,7 @@ describe('HttpLoggingInterceptor', () => {
       {
         requestId: 'request-1',
         accountId: 'user-1',
-        activeOrganizationId: 'org-1',
+        activeGymId: 'gym-1',
       },
       () => lastValueFrom(interceptor.intercept(context, next)),
     );
@@ -53,7 +53,7 @@ describe('HttpLoggingInterceptor', () => {
         statusCode: 201,
         outcome: 'success',
         accountId: 'user-1',
-        activeOrganizationId: 'org-1',
+        activeGymId: 'gym-1',
       }),
     );
     expect(JSON.stringify(logRequest.mock.calls[0][0])).not.toContain('must-not-leak');

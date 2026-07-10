@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { OrganizationsModule } from '../organizations/organizations.module';
+import { GymsModule } from '../gyms/gyms.module';
 import { SessionsModule } from '../sessions/sessions.module';
 import { SessionService } from '../sessions/application/session.service';
 import { UsersModule } from '../users/users.module';
@@ -34,7 +34,7 @@ import { SessionsController } from './interfaces/sessions.controller';
  * recibirá la traducción HTTP correcta sin tener que declarar `@UseFilters`.
  */
 @Module({
-  imports: [UsersModule, SessionsModule, OrganizationsModule, PassportModule, JwtModule.register({})],
+  imports: [UsersModule, SessionsModule, GymsModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController, SessionsController],
   providers: [
     { provide: APP_FILTER, useClass: DomainExceptionFilter },

@@ -57,7 +57,7 @@ export class UserPublicProfileModel {
   avatarUrl: string | null;
 }
 
-export class OrganizationModel {
+export class GymModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
 
@@ -82,19 +82,19 @@ export class OrganizationModel {
   @ApiProperty({ type: String, nullable: true, example: 'Inter' })
   fontFamily: string | null;
 
-  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/org/abc/logo-x.png' })
+  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/logo-x.png' })
   logoUrl: string | null;
 
-  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/org/abc/banner-x.png' })
+  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/banner-x.png' })
   bannerUrl: string | null;
 }
 
-export class OrganizationWithRoleModel extends OrganizationModel {
+export class GymWithRoleModel extends GymModel {
   @ApiProperty({ type: RoleSummaryModel })
   role: RoleSummaryModel;
 }
 
-export class OrganizationMemberModel {
+export class GymMemberModel {
   @ApiProperty({ format: 'uuid' })
   membershipId: string;
 
@@ -107,13 +107,13 @@ export class OrganizationMemberModel {
 
 export class MyPermissionsModel {
   @ApiProperty({ format: 'uuid' })
-  organizationId: string;
+  gymId: string;
 
   @ApiProperty({ type: RoleSummaryModel })
   role: RoleSummaryModel;
 
   @ApiProperty({
-    description: 'Data scope of the current user: SELF=1, ORGANIZATION=5, GLOBAL=10.',
+    description: 'Data scope of the current user: SELF=1, GYM=5, GLOBAL=10.',
     example: 5,
   })
   hierarchyLevel: number;
@@ -140,7 +140,7 @@ export class RoleViewModel {
   @ApiProperty({ type: String, nullable: true, example: 'Manages billing and invoices' })
   description: string | null;
 
-  @ApiProperty({ description: 'Data scope of the role: SELF=1, ORGANIZATION=5, GLOBAL=10.', example: 5 })
+  @ApiProperty({ description: 'Data scope of the role: SELF=1, GYM=5, GLOBAL=10.', example: 5 })
   hierarchyLevel: number;
 
   @ApiProperty({ format: 'date-time' })
@@ -163,13 +163,13 @@ export class OnboardingStatusModel {
   needsOnboarding: boolean;
 
   @ApiProperty({ minimum: 0 })
-  organizationsCount: number;
+  gymsCount: number;
 
   @ApiProperty()
-  hasActiveOrganization: boolean;
+  hasActiveGym: boolean;
 
   @ApiProperty({ format: 'uuid', nullable: true })
-  activeOrganizationId: string | null;
+  activeGymId: string | null;
 }
 
 export class SessionModel {
