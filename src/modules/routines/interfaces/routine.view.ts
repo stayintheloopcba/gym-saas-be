@@ -4,6 +4,7 @@ import { RoutineItem } from '../domain/routine-item.entity';
 import { Routine } from '../domain/routine.entity';
 
 export interface RoutineItemView {
+  id: string;
   routineId: string;
   exerciseName: string;
   sets: number;
@@ -27,6 +28,7 @@ export interface RoutineView {
 
 export function toRoutineItemView(item: RoutineItem): RoutineItemView {
   return {
+    id: item.id,
     routineId: item.routineId,
     exerciseName: item.exerciseName,
     sets: item.sets,

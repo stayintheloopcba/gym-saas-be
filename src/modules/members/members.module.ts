@@ -25,9 +25,11 @@ import { MembersController } from './interfaces/members.controller';
  *
  * Exporta `MEMBER_REPOSITORY` para que `gyms` (unit of work del owner) y
  * `permissions`/`roles` (RBAC repuntado, borrado de roles en uso) lo consuman
- * sin depender de TypeORM, y `MEMBERSHIP_CONTEXT_PORT` (implementado por
+ * sin depender de TypeORM, `MEMBERSHIP_CONTEXT_PORT` (implementado por
  * `TypeOrmMemberContextAdapter`, portado de `memberships` en la tarea 8) para
- * que `CommonModule` se lo inyecte al `AuthContextMiddleware`.
+ * que `CommonModule` se lo inyecte al `AuthContextMiddleware`, y
+ * `ResolveMemberStatus` (tarea 17) para que `access-logs` (tarea 18) derive
+ * `OVERDUE` al evaluar un check-in.
  *
  * Importa `SubscriptionsModule` con `forwardRef` porque `ResolveMemberStatus`
  * (tarea 17) necesita leer suscripciones para derivar `OVERDUE` en lectura, y
@@ -56,6 +58,6 @@ import { MembersController } from './interfaces/members.controller';
     ChangeMemberRoleUseCase,
     GrantPortalAccessUseCase,
   ],
-  exports: [MEMBER_REPOSITORY, MEMBERSHIP_CONTEXT_PORT],
+  exports: [MEMBER_REPOSITORY, MEMBERSHIP_CONTEXT_PORT, ResolveMemberStatus],
 })
 export class MembersModule {}

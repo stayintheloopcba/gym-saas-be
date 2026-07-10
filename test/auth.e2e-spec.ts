@@ -36,7 +36,7 @@ describe('Auth (e2e)', () => {
   it('registers a user, setting httpOnly cookies and no token in the body', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/register')
-      .send({ email, password, name: 'E2E' })
+      .send({ email, password, name: 'E2E', gymName: 'E2E Gym' })
       .expect(201);
 
     expect(res.body.email).toBe(email);
@@ -50,7 +50,9 @@ describe('Auth (e2e)', () => {
   });
 
   it('rejects a duplicate registration with 409', async () => {
-    const res = await request(app.getHttpServer()).post('/auth/register').send({ email, password, name: 'E2E' });
+    const res = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ email, password, name: 'E2E', gymName: 'E2E Gym' });
     expect(res.status).toBe(409);
   });
 

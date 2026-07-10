@@ -486,6 +486,9 @@ export class HealthStatusModel {
 }
 
 export class RoutineItemModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
   @ApiProperty({ example: 'Back squat' })
   exerciseName: string;
 

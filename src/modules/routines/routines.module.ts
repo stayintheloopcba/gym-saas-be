@@ -22,7 +22,11 @@ import { TypeOrmRoutineRepository } from './infrastructure/typeorm-routine.repos
 import { MemberRoutinesController } from './interfaces/member-routines.controller';
 import { RoutinesController } from './interfaces/routines.controller';
 
-/** Módulo de rutinas (`Routine` + `RoutineItem`) y sus asignaciones a members. */
+/**
+ * Módulo de rutinas (`Routine` + `RoutineItem`) y sus asignaciones a members.
+ * Exporta `ROUTINE_ITEM_REPOSITORY` para que `progress` (tarea 21) valide un
+ * `routineItemId` opcional al registrar una marca.
+ */
 @Module({
   imports: [TypeOrmModule.forFeature([Routine, RoutineItem, RoutineAssignment]), PermissionsModule, MembersModule],
   controllers: [RoutinesController, MemberRoutinesController],
@@ -39,6 +43,6 @@ import { RoutinesController } from './interfaces/routines.controller';
     UnassignRoutineUseCase,
     ListMemberRoutinesUseCase,
   ],
-  exports: [ROUTINE_REPOSITORY, ROUTINE_ASSIGNMENT_REPOSITORY],
+  exports: [ROUTINE_REPOSITORY, ROUTINE_ITEM_REPOSITORY, ROUTINE_ASSIGNMENT_REPOSITORY],
 })
 export class RoutinesModule {}

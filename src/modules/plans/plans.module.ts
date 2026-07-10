@@ -22,8 +22,8 @@ import { PlansController } from './interfaces/plans.controller';
 
 /**
  * Módulo de planes: `Plan` + los joins `plan_branches`/`plan_disciplines`
- * (write-through, ver `ValidatePlanScope`). Exporta `PLAN_REPOSITORY` para
- * que `subscriptions` (task 15) lo consuma.
+ * (write-through, ver `ValidatePlanScope`). Exporta `PLAN_REPOSITORY` y
+ * `PLAN_BRANCH_REPOSITORY` para que `subscriptions` (task 15) los consuma.
  */
 @Module({
   imports: [
@@ -44,6 +44,6 @@ import { PlansController } from './interfaces/plans.controller';
     UpdatePlanUseCase,
     RemovePlanUseCase,
   ],
-  exports: [PLAN_REPOSITORY],
+  exports: [PLAN_REPOSITORY, PLAN_BRANCH_REPOSITORY],
 })
 export class PlansModule {}
