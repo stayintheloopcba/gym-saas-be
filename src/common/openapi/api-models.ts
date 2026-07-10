@@ -484,3 +484,52 @@ export class HealthStatusModel {
   @ApiProperty({ enum: ['up', 'down'] })
   database: 'up' | 'down';
 }
+
+export class RoutineItemModel {
+  @ApiProperty({ example: 'Back squat' })
+  exerciseName: string;
+
+  @ApiProperty({ example: 4, minimum: 1 })
+  sets: number;
+
+  @ApiProperty({ example: '8-12' })
+  reps: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  notes: string | null;
+
+  @ApiProperty({ example: 1, minimum: 0 })
+  order: number;
+}
+
+export class RoutineModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ enum: ['TEMPLATE', 'PERSONAL'] })
+  scope: 'TEMPLATE' | 'PERSONAL';
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  ownerMemberId: string | null;
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  createdByMemberId: string | null;
+
+  @ApiProperty({ example: 'Push day' })
+  name: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  notes: string | null;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ type: RoutineItemModel, isArray: true })
+  items: RoutineItemModel[];
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
