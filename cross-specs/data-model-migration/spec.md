@@ -48,5 +48,9 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 22 | Index/constraint pass + OpenAPI + full regression | 8, 9, 14, 17, 18, 20, 21 | [x] |
 | 23 | E2E contract test: full member lifecycle | 22 | [x] |
 
+## Pull request
+
+All 23 tasks complete. PR to `develop`: https://github.com/stayintheloopcba/gym-saas-be/pull/2
+
 <!-- On archive, this file is rewritten as the final summary (same spirit as the
 feature's done/README.md, scoped to this app) and cross_spec points to done/. -->
