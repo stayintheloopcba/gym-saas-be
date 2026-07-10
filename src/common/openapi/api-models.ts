@@ -172,6 +172,20 @@ export class BranchModel {
   createdAt: Date;
 }
 
+export class DisciplineModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ example: 'CROSSFIT' })
+  code: string;
+
+  @ApiProperty({ example: 'Crossfit' })
+  name: string;
+
+  @ApiProperty()
+  active: boolean;
+}
+
 export class MemberModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
