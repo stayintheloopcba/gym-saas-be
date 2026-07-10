@@ -143,6 +143,35 @@ export class GymMemberModel {
   user: UserPublicProfileModel;
 }
 
+export class BranchModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ example: 'Downtown' })
+  name: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  address: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone: string | null;
+
+  @ApiProperty({ type: Object, nullable: true })
+  openingHours: Record<string, unknown> | null;
+
+  @ApiProperty({ type: Number, nullable: true })
+  capacity: number | null;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
 export class MemberModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
