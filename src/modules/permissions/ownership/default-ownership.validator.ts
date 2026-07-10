@@ -1,10 +1,10 @@
-import { hasGlobalAccess, hasOrganizationAccess } from '../../../common/enums/hierarchy-level.enum';
+import { hasGlobalAccess, hasGymAccess } from '../../../common/enums/hierarchy-level.enum';
 import { OwnershipContext } from './ownership-context';
 import { OwnershipResult, OwnershipValidator } from './ownership-validator';
 
 /** Atributos mínimos que el validator por defecto necesita de un recurso. */
 export interface OwnedResource {
-  organizationId?: string | null;
+  gymId?: string | null;
   createdBy?: string | null;
 }
 
@@ -13,10 +13,10 @@ export type OwnedResourceLoader = (resourceId: string) => Promise<OwnedResource 
 
 /**
  * Validator por defecto reutilizable por CRUDs genéricos: resuelve ownership a
- * partir de `createdBy` (SELF) y `organizationId` (ORGANIZATION) del recurso.
+ * partir de `createdBy` (SELF) y `gymId` (GYM) del recurso.
  *
  * - `GLOBAL` → acceso a cualquier recurso existente.
- * - `ORGANIZATION` → solo recursos de la organización activa.
+ * - `GYM` → solo recursos de la organización activa.
  * - `SELF` → solo recursos de la organización activa creados por el usuario.
  *
  * Se construye con un `loader` (típicamente envuelve un repositorio) para no
@@ -38,8 +38,8 @@ export class DefaultOwnershipValidator implements OwnershipValidator {
       return { found: true, owned: true };
     }
 
-    const sameOrg = resource.organizationId === context.organizationId;
-    if (hasOrganizationAccess(context.hierarchyLevel)) {
+    const sameOrg = resource.gymId === context.gymId;
+    if (hasGymAccess(context.hierarchyLevel)) {
       return { found: true, owned: sameOrg };
     }
 

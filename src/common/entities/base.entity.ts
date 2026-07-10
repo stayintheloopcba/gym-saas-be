@@ -4,8 +4,8 @@ import { BaseAuditEntity } from './base-audit.entity';
 /**
  * Entidad base: identificador UUID + campos de auditoría y soft delete.
  *
- * La heredan las entidades principales del dominio (User, Organization,
- * Membership, ...) con `extends BaseEntity`.
+ * La heredan las entidades principales del dominio (User, Gym,
+ * Member, ...) con `extends BaseEntity`.
  */
 export abstract class BaseEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn('uuid')

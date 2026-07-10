@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
 import { Permission } from '../domain/permission.entity';
 import { PERMISSIONS } from '../domain/permission-key';
 import { RolePermission } from '../domain/role-permission.entity';
@@ -48,10 +49,17 @@ describe('CatalogSeeder', () => {
     await seeder.onApplicationBootstrap();
 
     expect(permissionRepository.save).toHaveBeenCalledTimes(Object.keys(PERMISSIONS).length);
-    expect(roleRepository.save).toHaveBeenCalledTimes(4);
+    expect(roleRepository.save).toHaveBeenCalledTimes(5);
     // owner gets every permission in the catalog.
     expect(rolePermissionRepository.save).toHaveBeenCalledWith(
-      expect.objectContaining({ roleId: 'role-owner', permissionCode: PERMISSIONS.ORGANIZATION_DELETE }),
+      expect.objectContaining({ roleId: 'role-owner', permissionCode: PERMISSIONS.GYM_DELETE }),
+    );
+    // student is seeded with SELF hierarchy and granted its self-scoped permissions.
+    expect(roleRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'student', hierarchyLevel: HierarchyLevel.SELF }),
+    );
+    expect(rolePermissionRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ roleId: 'role-student', permissionCode: PERMISSIONS.PROGRESS_RECORD }),
     );
   });
 

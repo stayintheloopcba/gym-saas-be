@@ -57,7 +57,7 @@ export class UserPublicProfileModel {
   avatarUrl: string | null;
 }
 
-export class OrganizationModel {
+export class GymModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
 
@@ -72,6 +72,20 @@ export class OrganizationModel {
 
   @ApiProperty({ type: String, format: 'date-time', nullable: true, description: 'Cosmetic 7-day trial end.' })
   trialEndsAt: Date | null;
+}
+
+export class GymSettingsModel {
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ type: String, nullable: true, example: 'Acme Gym' })
+  displayName: string | null;
+
+  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/logo-x.png' })
+  logoUrl: string | null;
+
+  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/banner-x.png' })
+  bannerUrl: string | null;
 
   @ApiProperty({ type: String, nullable: true, example: '#0F62FE' })
   primaryColor: string | null;
@@ -82,19 +96,43 @@ export class OrganizationModel {
   @ApiProperty({ type: String, nullable: true, example: 'Inter' })
   fontFamily: string | null;
 
-  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/org/abc/logo-x.png' })
-  logoUrl: string | null;
+  @ApiProperty({ type: String, nullable: true, example: 'light' })
+  theme: string | null;
 
-  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/org/abc/banner-x.png' })
-  bannerUrl: string | null;
+  @ApiProperty({ example: 'America/Argentina/Buenos_Aires' })
+  timezone: string;
+
+  @ApiProperty({ example: 'ARS' })
+  currency: string;
+
+  @ApiProperty({ type: Object, nullable: true })
+  openingHours: Record<string, unknown> | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'email' })
+  contactEmail: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  contactPhone: string | null;
+
+  @ApiProperty({ example: 5 })
+  moraGraceDays: number;
+
+  @ApiProperty({ example: 0 })
+  moraSurchargePct: number;
+
+  @ApiProperty({ type: Object, nullable: true })
+  renewalPolicy: Record<string, unknown> | null;
+
+  @ApiProperty({ type: String, isArray: true, example: ['CASH'] })
+  enabledPaymentMethods: string[];
 }
 
-export class OrganizationWithRoleModel extends OrganizationModel {
+export class GymWithRoleModel extends GymModel {
   @ApiProperty({ type: RoleSummaryModel })
   role: RoleSummaryModel;
 }
 
-export class OrganizationMemberModel {
+export class GymMemberModel {
   @ApiProperty({ format: 'uuid' })
   membershipId: string;
 
@@ -105,15 +143,245 @@ export class OrganizationMemberModel {
   user: UserPublicProfileModel;
 }
 
+export class BranchModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ example: 'Downtown' })
+  name: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  address: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone: string | null;
+
+  @ApiProperty({ type: Object, nullable: true })
+  openingHours: Record<string, unknown> | null;
+
+  @ApiProperty({ type: Number, nullable: true })
+  capacity: number | null;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
+export class DisciplineModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ example: 'CROSSFIT' })
+  code: string;
+
+  @ApiProperty({ example: 'Crossfit' })
+  name: string;
+
+  @ApiProperty()
+  active: boolean;
+}
+
+export class PlanModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ example: 'Full access' })
+  name: string;
+
+  @ApiProperty({ example: 15000 })
+  price: number;
+
+  @ApiProperty({ example: 'ARS' })
+  currency: string;
+
+  @ApiProperty({ enum: ['WEEKLY', 'MONTHLY', 'QUARTERLY', 'BIANNUAL', 'ANNUAL'] })
+  periodicity: string;
+
+  @ApiProperty({ type: Number, nullable: true, description: 'null = unlimited' })
+  visitsPerMonth: number | null;
+
+  @ApiProperty({ type: Object, nullable: true })
+  timeWindow: Record<string, unknown> | null;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ type: String, isArray: true, format: 'uuid' })
+  branchIds: string[];
+
+  @ApiProperty({ type: String, isArray: true, format: 'uuid' })
+  disciplineIds: string[];
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
+export class SubscriptionModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  planId: string;
+
+  @ApiProperty({ type: String, format: 'date' })
+  startDate: string;
+
+  @ApiProperty({ type: String, format: 'date', nullable: true })
+  endDate: string | null;
+
+  @ApiProperty({ type: String, format: 'date', nullable: true })
+  paidUntil: string | null;
+
+  @ApiProperty({ enum: ['ACTIVE', 'EXPIRED', 'CANCELLED'] })
+  status: string;
+
+  @ApiProperty({ enum: ['AUTO', 'MANUAL'] })
+  renewalMode: string;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
+export class PaymentModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  subscriptionId: string | null;
+
+  @ApiProperty({ example: 45000 })
+  amount: number;
+
+  @ApiProperty({ example: 'ARS' })
+  currency: string;
+
+  @ApiProperty({ enum: ['CASH', 'CARD', 'TRANSFER'] })
+  method: string;
+
+  @ApiProperty({ enum: ['PAID', 'PENDING', 'VOID'] })
+  status: string;
+
+  @ApiProperty({ format: 'date-time' })
+  paidAt: Date;
+
+  @ApiProperty({ type: String, format: 'date' })
+  periodStart: string;
+
+  @ApiProperty({ type: String, format: 'date' })
+  periodEnd: string;
+
+  @ApiProperty({ type: Number, nullable: true })
+  lateFee: number | null;
+
+  @ApiProperty({ type: Object, nullable: true })
+  metadata: Record<string, unknown> | null;
+}
+
+export class AccessLogModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  branchId: string | null;
+
+  @ApiProperty({ format: 'date-time' })
+  timestamp: Date;
+
+  @ApiProperty({ enum: ['GRANTED', 'DENIED'] })
+  result: string;
+
+  @ApiProperty({ type: String, nullable: true, example: 'overdue' })
+  reason: string | null;
+}
+
+export class MemberModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  userId: string | null;
+
+  @ApiProperty({ type: RoleSummaryModel })
+  role: RoleSummaryModel;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  branchId: string | null;
+
+  @ApiProperty({ example: 'Ada' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Lovelace' })
+  lastName: string;
+
+  @ApiProperty({ type: String, nullable: true, example: '30111222' })
+  documentId: string | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'email' })
+  email: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone: string | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'date' })
+  birthDate: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  photoUrl: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  emergencyContactName: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  emergencyContactPhone: string | null;
+
+  @ApiProperty({ enum: ['ACTIVE', 'SUSPENDED', 'OVERDUE', 'INACTIVE'] })
+  status: string;
+
+  @ApiProperty({ type: Object, nullable: true })
+  consents: Record<string, unknown> | null;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
 export class MyPermissionsModel {
   @ApiProperty({ format: 'uuid' })
-  organizationId: string;
+  gymId: string;
 
   @ApiProperty({ type: RoleSummaryModel })
   role: RoleSummaryModel;
 
   @ApiProperty({
-    description: 'Data scope of the current user: SELF=1, ORGANIZATION=5, GLOBAL=10.',
+    description: 'Data scope of the current user: SELF=1, GYM=5, GLOBAL=10.',
     example: 5,
   })
   hierarchyLevel: number;
@@ -122,7 +390,7 @@ export class MyPermissionsModel {
     type: String,
     isArray: true,
     description: 'Effective permission codes (resource:action) granted to the current user.',
-    example: ['organization:read', 'members:read', 'resources:create'],
+    example: ['gym:read', 'members:read', 'resources:create'],
   })
   permissions: string[];
 }
@@ -140,7 +408,7 @@ export class RoleViewModel {
   @ApiProperty({ type: String, nullable: true, example: 'Manages billing and invoices' })
   description: string | null;
 
-  @ApiProperty({ description: 'Data scope of the role: SELF=1, ORGANIZATION=5, GLOBAL=10.', example: 5 })
+  @ApiProperty({ description: 'Data scope of the role: SELF=1, GYM=5, GLOBAL=10.', example: 5 })
   hierarchyLevel: number;
 
   @ApiProperty({ format: 'date-time' })
@@ -163,13 +431,13 @@ export class OnboardingStatusModel {
   needsOnboarding: boolean;
 
   @ApiProperty({ minimum: 0 })
-  organizationsCount: number;
+  gymsCount: number;
 
   @ApiProperty()
-  hasActiveOrganization: boolean;
+  hasActiveGym: boolean;
 
   @ApiProperty({ format: 'uuid', nullable: true })
-  activeOrganizationId: string | null;
+  activeGymId: string | null;
 }
 
 export class SessionModel {
@@ -215,4 +483,107 @@ export class HealthStatusModel {
 
   @ApiProperty({ enum: ['up', 'down'] })
   database: 'up' | 'down';
+}
+
+export class RoutineItemModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ example: 'Back squat' })
+  exerciseName: string;
+
+  @ApiProperty({ example: 4, minimum: 1 })
+  sets: number;
+
+  @ApiProperty({ example: '8-12' })
+  reps: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  notes: string | null;
+
+  @ApiProperty({ example: 1, minimum: 0 })
+  order: number;
+}
+
+export class RoutineModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ enum: ['TEMPLATE', 'PERSONAL'] })
+  scope: 'TEMPLATE' | 'PERSONAL';
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  ownerMemberId: string | null;
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  createdByMemberId: string | null;
+
+  @ApiProperty({ example: 'Push day' })
+  name: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  notes: string | null;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ type: RoutineItemModel, isArray: true })
+  items: RoutineItemModel[];
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: Date;
+}
+
+export class AssignmentModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  routineId: string;
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  assignedByMemberId: string | null;
+
+  @ApiProperty({ format: 'date-time' })
+  assignedAt: Date;
+
+  @ApiProperty({ format: 'date-time', nullable: true })
+  unassignedAt: Date | null;
+}
+
+export class MemberRoutineModel extends AssignmentModel {
+  @ApiProperty({ type: RoutineModel })
+  routine: RoutineModel;
+}
+
+export class ProgressEntryModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  routineItemId: string | null;
+
+  @ApiProperty({ example: 82.5 })
+  value: number;
+
+  @ApiProperty({ type: Number, nullable: true })
+  reps: number | null;
+
+  @ApiProperty({ format: 'date-time' })
+  recordedAt: Date;
 }

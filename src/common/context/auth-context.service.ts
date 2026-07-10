@@ -31,7 +31,7 @@ export class AuthContextService {
    * (usuario sin org seleccionada, o cookie inválida/obsoleta que el middleware
    * descartó). El código de negocio scopea sus queries a este valor.
    */
-  getActiveOrganizationId(): string | undefined {
-    return authContextStorage.getStore()?.activeOrganizationId;
+  getActiveGymId(): string | undefined {
+    return authContextStorage.getStore()?.activeGymId;
   }
 }

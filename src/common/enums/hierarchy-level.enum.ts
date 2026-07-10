@@ -8,14 +8,14 @@ export enum HierarchyLevel {
   /** Solo los registros propios (`createdBy === userId`). */
   SELF = 1,
   /** Todos los registros de la organización activa. */
-  ORGANIZATION = 5,
+  GYM = 5,
   /** Todos los registros, cruzando organizaciones. Reservado para `platform_admin`. */
   GLOBAL = 10,
 }
 
 /** `true` si el nivel alcanza (o supera) el acceso a nivel organización. */
-export function hasOrganizationAccess(level: HierarchyLevel): boolean {
-  return level >= HierarchyLevel.ORGANIZATION;
+export function hasGymAccess(level: HierarchyLevel): boolean {
+  return level >= HierarchyLevel.GYM;
 }
 
 /** `true` si el nivel alcanza el acceso global (cross-org). */

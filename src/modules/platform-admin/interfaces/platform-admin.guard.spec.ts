@@ -21,7 +21,7 @@ describe('PlatformAdminGuard', () => {
     expect(findUserById.execute).not.toHaveBeenCalled();
   });
 
-  it('rejects a user without the platform-admin flag, even with an organization permission context', async () => {
+  it('rejects a user without the platform-admin flag, even with a gym permission context', async () => {
     findUserById.execute.mockResolvedValue({ id: 'user-1', isPlatformAdmin: false });
 
     await expect(guard.canActivate(executionContext({ user: { id: 'user-1' } }))).rejects.toBeInstanceOf(

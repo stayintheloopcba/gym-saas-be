@@ -1,6 +1,6 @@
 import { AuthProvider } from '../../../common/enums/auth-provider.enum';
-import { CreateOrganizationUseCase } from '../../organizations/application/create-organization.use-case';
-import { Organization } from '../../organizations/domain/organization.entity';
+import { CreateGymUseCase } from '../../gyms/application/create-gym.use-case';
+import { Gym } from '../../gyms/domain/gym.entity';
 import { CreateUserUseCase } from '../../users/application/create-user.use-case';
 import { User } from '../../users/domain/user.entity';
 import { DuplicateEmailError } from '../../users/domain/user.errors';
@@ -10,7 +10,7 @@ import { RegisterUseCase } from './register.use-case';
 
 describe('RegisterUseCase', () => {
   let createUser: jest.Mocked<Pick<CreateUserUseCase, 'execute'>>;
-  let createOrganization: jest.Mocked<Pick<CreateOrganizationUseCase, 'execute'>>;
+  let createGym: jest.Mocked<Pick<CreateGymUseCase, 'execute'>>;
   let hasher: jest.Mocked<PasswordHasher>;
   let sessions: jest.Mocked<Pick<SessionService, 'start'>>;
   let useCase: RegisterUseCase;
@@ -26,33 +26,33 @@ describe('RegisterUseCase', () => {
       createdAt: new Date('2026-01-01T00:00:00Z'),
     });
 
-  const buildOrg = (): Organization => Object.assign(new Organization(), { id: 'org-1', name: 'Acme', slug: 'acme' });
+  const buildOrg = (): Gym => Object.assign(new Gym(), { id: 'gym-1', name: 'Acme', slug: 'acme' });
 
-  const command = { email: 'a@b.com', password: 'plain123', name: 'A', organizationName: 'Acme' };
+  const command = { email: 'a@b.com', password: 'plain123', name: 'A', gymName: 'Acme' };
 
   beforeEach(() => {
     createUser = { execute: jest.fn().mockResolvedValue(buildUser()) };
-    createOrganization = { execute: jest.fn().mockResolvedValue(buildOrg()) };
+    createGym = { execute: jest.fn().mockResolvedValue(buildOrg()) };
     hasher = { hash: jest.fn().mockResolvedValue('hashed'), compare: jest.fn() };
     sessions = { start: jest.fn().mockResolvedValue({ accessToken: 'at', refreshToken: 'rt' }) };
     useCase = new RegisterUseCase(
       createUser as unknown as CreateUserUseCase,
-      createOrganization as unknown as CreateOrganizationUseCase,
+      createGym as unknown as CreateGymUseCase,
       hasher,
       sessions as unknown as SessionService,
     );
   });
 
-  it('hashes the password, creates a LOCAL user and provisions an organization', async () => {
+  it('hashes the password, creates a LOCAL user and provisions a gym', async () => {
     const result = await useCase.execute(command);
 
     expect(hasher.hash).toHaveBeenCalledWith('plain123');
     expect(createUser.execute).toHaveBeenCalledWith(
       expect.objectContaining({ provider: AuthProvider.LOCAL, passwordHash: 'hashed' }),
     );
-    expect(createOrganization.execute).toHaveBeenCalledWith({ ownerUserId: 'u1', name: 'Acme' });
+    expect(createGym.execute).toHaveBeenCalledWith({ ownerUserId: 'u1', name: 'Acme' });
     expect(result.tokens).toEqual({ accessToken: 'at', refreshToken: 'rt' });
-    expect(result.activeOrganizationId).toBe('org-1');
+    expect(result.activeGymId).toBe('gym-1');
     // El perfil público nunca expone el hash.
     expect((result.user as unknown as Record<string, unknown>).passwordHash).toBeUndefined();
   });
@@ -61,6 +61,6 @@ describe('RegisterUseCase', () => {
     createUser.execute.mockRejectedValue(new DuplicateEmailError('a@b.com'));
 
     await expect(useCase.execute(command)).rejects.toBeInstanceOf(DuplicateEmailError);
-    expect(createOrganization.execute).not.toHaveBeenCalled();
+    expect(createGym.execute).not.toHaveBeenCalled();
   });
 });

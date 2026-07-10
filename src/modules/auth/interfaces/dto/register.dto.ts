@@ -23,10 +23,10 @@ export class RegisterDto {
     example: 'Acme Inc.',
     minLength: 1,
     maxLength: 255,
-    description: 'Name of the organization created for the new user (becomes its OWNER).',
+    description: 'Name of the gym created for the new user (becomes its OWNER).',
   })
   @IsString()
   @MinLength(1)
   @MaxLength(255)
-  organizationName: string;
+  gymName: string;
 }

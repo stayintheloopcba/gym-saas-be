@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { AuthContext, authContextStorage } from './auth-context.store';
-import { ACTIVE_ORG_COOKIE, MEMBERSHIP_CONTEXT_PORT } from './membership-context.port';
+import { ACTIVE_GYM_COOKIE, MEMBERSHIP_CONTEXT_PORT } from './membership-context.port';
 import type { MembershipContextPort } from './membership-context.port';
 
 const ACCESS_TOKEN_COOKIE = 'access_token';
@@ -18,12 +18,12 @@ interface AccessTokenPayload {
 
 /**
  * Creates an isolated request context and enriches it with authenticated user
- * and active-organization data when their cookies are valid.
+ * and active-gym data when their cookies are valid.
  */
 @Injectable()
 export class AuthContextMiddleware implements NestMiddleware {
   private readonly accessSecret: string;
-  private readonly activeOrgCookie: string;
+  private readonly activeGymCookie: string;
 
   constructor(
     private readonly jwt: JwtService,
@@ -33,7 +33,7 @@ export class AuthContextMiddleware implements NestMiddleware {
     private readonly membershipContext?: MembershipContextPort,
   ) {
     this.accessSecret = config.getOrThrow<string>('JWT_ACCESS_SECRET');
-    this.activeOrgCookie = config.get<string>('ACTIVE_ORG_COOKIE', ACTIVE_ORG_COOKIE);
+    this.activeGymCookie = config.get<string>('ACTIVE_GYM_COOKIE', ACTIVE_GYM_COOKIE);
   }
 
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -60,14 +60,14 @@ export class AuthContextMiddleware implements NestMiddleware {
       return;
     }
 
-    const candidateOrgId = cookies?.[this.activeOrgCookie];
-    if (candidateOrgId && this.membershipContext) {
+    const candidateGymId = cookies?.[this.activeGymCookie];
+    if (candidateGymId && this.membershipContext) {
       try {
-        if (await this.membershipContext.isActiveMember(accountId, candidateOrgId)) {
-          context.activeOrganizationId = candidateOrgId;
+        if (await this.membershipContext.isActiveMember(accountId, candidateGymId)) {
+          context.activeGymId = candidateGymId;
         }
       } catch {
-        // A validation failure leaves the request without an active organization.
+        // A validation failure leaves the request without an active gym.
       }
     }
 

@@ -9,12 +9,21 @@ import { AuthContextMiddleware } from './common/context/auth-context.middleware'
 import { buildTypeOrmConfig } from './config/database.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
-import { MembershipsModule } from './modules/memberships/memberships.module';
-import { OrganizationsModule } from './modules/organizations/organizations.module';
+import { MembersModule } from './modules/members/members.module';
+import { AccessLogsModule } from './modules/access-logs/access-logs.module';
+import { BranchesModule } from './modules/branches/branches.module';
+import { DisciplinesModule } from './modules/disciplines/disciplines.module';
+import { GymSettingsModule } from './modules/gym-settings/gym-settings.module';
+import { GymsModule } from './modules/gyms/gyms.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
+import { PlansModule } from './modules/plans/plans.module';
 import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
+import { ProgressModule } from './modules/progress/progress.module';
 import { RolesModule } from './modules/roles/roles.module';
+import { RoutinesModule } from './modules/routines/routines.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -32,9 +41,18 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     PermissionsModule,
     PlatformAdminModule,
-    MembershipsModule,
+    MembersModule,
     RolesModule,
-    OrganizationsModule,
+    GymsModule,
+    GymSettingsModule,
+    BranchesModule,
+    DisciplinesModule,
+    PlansModule,
+    SubscriptionsModule,
+    PaymentsModule,
+    AccessLogsModule,
+    RoutinesModule,
+    ProgressModule,
     StorageModule,
   ],
   controllers: [AppController],

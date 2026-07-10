@@ -31,6 +31,6 @@ describe('OpenAPI configuration', () => {
     expect(document.paths).toHaveProperty('/openapi-test');
     expect(document.components?.securitySchemes).toHaveProperty(ACCESS_TOKEN_SECURITY);
     expect(document.components?.securitySchemes).toHaveProperty('refresh-token');
-    expect(document.components?.securitySchemes).toHaveProperty('active-organization');
+    expect(document.components?.securitySchemes).toHaveProperty('active-gym');
   });
 });

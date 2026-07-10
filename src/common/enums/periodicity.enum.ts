@@ -1,0 +1,7 @@
+export enum Periodicity {
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  BIANNUAL = 'BIANNUAL',
+  ANNUAL = 'ANNUAL',
+}

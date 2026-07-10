@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
-import { Membership } from '../../memberships/domain/membership.entity';
-import { MembershipRoleInfo, PermissionRepository } from '../domain/permission.repository';
+import { Member } from '../../members/domain/member.entity';
+import { MemberRoleInfo, PermissionRepository } from '../domain/permission.repository';
 import { RolePermission } from '../domain/role-permission.entity';
 import { Role } from '../domain/role.entity';
 import { RoleSummary } from '../domain/role-summary';
@@ -11,17 +11,17 @@ import { RoleSummary } from '../domain/role-summary';
 @Injectable()
 export class TypeOrmPermissionRepository implements PermissionRepository {
   constructor(
-    @InjectRepository(Membership) private readonly memberships: Repository<Membership>,
+    @InjectRepository(Member) private readonly members: Repository<Member>,
     @InjectRepository(Role) private readonly roles: Repository<Role>,
     @InjectRepository(RolePermission) private readonly rolePermissions: Repository<RolePermission>,
   ) {}
 
-  async findMembershipRole(userId: string, organizationId: string): Promise<MembershipRoleInfo | null> {
-    const membership = await this.memberships.findOne({ where: { userId, organizationId } });
-    if (!membership) {
+  async findMemberRole(userId: string, gymId: string): Promise<MemberRoleInfo | null> {
+    const member = await this.members.findOne({ where: { userId, gymId } });
+    if (!member) {
       return null;
     }
-    const role = await this.roles.findOne({ where: { id: membership.roleId } });
+    const role = await this.roles.findOne({ where: { id: member.roleId } });
     if (!role) {
       return null;
     }

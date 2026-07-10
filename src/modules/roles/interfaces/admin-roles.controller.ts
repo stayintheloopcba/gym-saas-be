@@ -41,7 +41,7 @@ import { RoleView, toRoleView } from './role.view';
 
 /**
  * Administración del catálogo global de roles. Solo platform admins
- * (`PlatformAdminGuard`), sin `ActiveOrgGuard`/`PermissionGuard`: no es una
+ * (`PlatformAdminGuard`), sin `ActiveGymGuard`/`PermissionGuard`: no es una
  * superficie org-scoped.
  */
 @Controller('admin/roles')

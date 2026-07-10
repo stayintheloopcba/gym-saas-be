@@ -5,7 +5,7 @@ import { OwnershipContext } from './ownership-context';
 
 const ctx = (hierarchyLevel: HierarchyLevel): OwnershipContext => ({
   userId: 'user-1',
-  organizationId: 'org-1',
+  gymId: 'gym-1',
   hierarchyLevel,
 });
 
@@ -23,25 +23,25 @@ describe('applyOwnershipScope', () => {
     expect(qb.andWhere).not.toHaveBeenCalled();
   });
 
-  it('filters by organization for ORGANIZATION', () => {
+  it('filters by gym for GYM', () => {
     const qb = fakeQb();
 
-    applyOwnershipScope(qb, 'resource', ctx(HierarchyLevel.ORGANIZATION));
+    applyOwnershipScope(qb, 'resource', ctx(HierarchyLevel.GYM));
 
     expect(qb.andWhere).toHaveBeenCalledTimes(1);
-    expect(qb.andWhere).toHaveBeenCalledWith('resource.organization_id = :ownershipOrgId', {
-      ownershipOrgId: 'org-1',
+    expect(qb.andWhere).toHaveBeenCalledWith('resource.gym_id = :ownershipGymId', {
+      ownershipGymId: 'gym-1',
     });
   });
 
-  it('filters by organization and owner for SELF', () => {
+  it('filters by gym and owner for SELF', () => {
     const qb = fakeQb();
 
     applyOwnershipScope(qb, 'resource', ctx(HierarchyLevel.SELF));
 
     expect(qb.andWhere).toHaveBeenCalledTimes(2);
-    expect(qb.andWhere).toHaveBeenCalledWith('resource.organization_id = :ownershipOrgId', {
-      ownershipOrgId: 'org-1',
+    expect(qb.andWhere).toHaveBeenCalledWith('resource.gym_id = :ownershipGymId', {
+      ownershipGymId: 'gym-1',
     });
     expect(qb.andWhere).toHaveBeenCalledWith('resource.created_by = :ownershipUserId', {
       ownershipUserId: 'user-1',

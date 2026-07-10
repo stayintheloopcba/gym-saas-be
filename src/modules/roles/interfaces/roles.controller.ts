@@ -2,10 +2,10 @@ import { Controller, Get, Param, ParseUUIDPipe, UseFilters, UseGuards } from '@n
 import { ApiCookieAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 import { DomainExceptionFilter } from '../../../common/errors/domain-exception.filter';
-import { ActiveOrgGuard } from '../../../common/guards/active-org.guard';
+import { ActiveGymGuard } from '../../../common/guards/active-gym.guard';
 import { PermissionGuard } from '../../../common/guards/permission.guard';
 import { RoleViewModel } from '../../../common/openapi/api-models';
-import { ACCESS_TOKEN_SECURITY, ACTIVE_ORG_SECURITY } from '../../../config/openapi.config';
+import { ACCESS_TOKEN_SECURITY, ACTIVE_GYM_SECURITY } from '../../../config/openapi.config';
 import { CurrentUser } from '../../auth/interfaces/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/interfaces/jwt-auth.guard';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
@@ -18,12 +18,12 @@ import { RoleView, toRoleView } from './role.view';
  * miembros de una organización puedan elegir un rol al invitar o cambiar el
  * rol de un miembro. La administración del catálogo vive en `/admin/roles`.
  */
-@Controller('organizations/:id/roles')
-@UseGuards(JwtAuthGuard, ActiveOrgGuard, PermissionGuard)
+@Controller('gyms/:id/roles')
+@UseGuards(JwtAuthGuard, ActiveGymGuard, PermissionGuard)
 @UseFilters(DomainExceptionFilter)
 @ApiTags('Roles')
 @ApiCookieAuth(ACCESS_TOKEN_SECURITY)
-@ApiCookieAuth(ACTIVE_ORG_SECURITY)
+@ApiCookieAuth(ACTIVE_GYM_SECURITY)
 export class RolesController {
   constructor(private readonly listRoles: ListRolesUseCase) {}
 
@@ -32,11 +32,8 @@ export class RolesController {
   @ApiOperation({ summary: 'List the global role catalog' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: RoleViewModel, isArray: true })
-  async list(
-    @CurrentUser() user: UserPublicProfile,
-    @Param('id', ParseUUIDPipe) organizationId: string,
-  ): Promise<RoleView[]> {
-    const roles = await this.listRoles.execute(user.id, organizationId);
+  async list(@CurrentUser() user: UserPublicProfile, @Param('id', ParseUUIDPipe) gymId: string): Promise<RoleView[]> {
+    const roles = await this.listRoles.execute(user.id, gymId);
     return roles.map(toRoleView);
   }
 }

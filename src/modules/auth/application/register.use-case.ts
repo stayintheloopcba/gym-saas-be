@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthProvider } from '../../../common/enums/auth-provider.enum';
-import { CreateOrganizationUseCase } from '../../organizations/application/create-organization.use-case';
+import { CreateGymUseCase } from '../../gyms/application/create-gym.use-case';
 import { CreateUserUseCase } from '../../users/application/create-user.use-case';
 import { toPublicProfile } from '../../users/application/user-public-profile';
 import { SessionMetadata, SessionService } from '../../sessions/application/session.service';
@@ -12,14 +12,14 @@ export interface RegisterCommand {
   email: string;
   password: string;
   name: string;
-  organizationName: string;
+  gymName: string;
   session?: SessionMetadata;
 }
 
 /**
  * Registro self-serve: hashea la contraseña, crea el usuario LOCAL y, en el mismo
  * flujo, provisiona su organización (membresía `OWNER`, atómica) y emite tokens.
- * Devuelve la org creada como `activeOrganizationId` para que la capa de interfaces
+ * Devuelve la org creada como `activeGymId` para que la capa de interfaces
  * la deje activa.
  *
  * La creación de usuario y la de organización no comparten transacción: si la org
@@ -30,7 +30,7 @@ export interface RegisterCommand {
 export class RegisterUseCase {
   constructor(
     private readonly createUser: CreateUserUseCase,
-    private readonly createOrganization: CreateOrganizationUseCase,
+    private readonly createGym: CreateGymUseCase,
     @Inject(PASSWORD_HASHER) private readonly hasher: PasswordHasher,
     private readonly sessions: SessionService,
   ) {}
@@ -45,13 +45,13 @@ export class RegisterUseCase {
       passwordHash,
     });
 
-    const organization = await this.createOrganization.execute({
+    const gym = await this.createGym.execute({
       ownerUserId: user.id,
-      name: command.organizationName,
+      name: command.gymName,
     });
 
     const profile = toPublicProfile(user);
     const tokens = await this.sessions.start(profile, command.session);
-    return { user: profile, tokens, activeOrganizationId: organization.id };
+    return { user: profile, tokens, activeGymId: gym.id };
   }
 }
