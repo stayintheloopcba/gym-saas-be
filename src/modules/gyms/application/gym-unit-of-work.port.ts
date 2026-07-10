@@ -6,8 +6,8 @@ import { Gym } from '../domain/gym.entity';
 export const GYM_UNIT_OF_WORK = Symbol('GYM_UNIT_OF_WORK');
 
 /**
- * Unit-of-work que persiste una organización y su membresía `OWNER` en una sola
- * transacción (ver Decision 5 del design: una org sin owner es un estado inválido).
+ * Unit-of-work que persiste un gym y su `Member` `owner` en una sola
+ * transacción (ver Decision 5 del design: un gym sin owner es un estado inválido).
  *
  * Vive como port para que `CreateGymUseCase` siga siendo agnóstico de
  * TypeORM: la derivación del slug y las validaciones quedan en la aplicación; solo
@@ -15,8 +15,9 @@ export const GYM_UNIT_OF_WORK = Symbol('GYM_UNIT_OF_WORK');
  */
 export interface GymUnitOfWork {
   /**
-   * Persiste `gym` y crea su membresía `OWNER` para `ownerUserId`
-   * atómicamente. Devuelve la organización persistida.
+   * Persiste `gym` y crea su `Member` `owner` para `ownerUserId` (con los
+   * datos personales tomados del `User`) atómicamente. Devuelve el gym
+   * persistido.
    */
   createGymWithOwner(gym: Gym, ownerUserId: string): Promise<Gym>;
 }
