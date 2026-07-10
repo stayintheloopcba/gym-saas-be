@@ -1,21 +1,16 @@
 import { RoleSummary } from '../../permissions/domain/role-summary';
 import { Gym } from '../domain/gym.entity';
 
-/** Forma pública de una organización en las respuestas HTTP. */
+/** Forma pública de un gym en las respuestas HTTP. Branding vive en `GymSettings`. */
 export interface GymView {
   id: string;
   name: string;
   slug: string;
   createdAt: Date;
   trialEndsAt: Date | null;
-  primaryColor: string | null;
-  secondaryColor: string | null;
-  fontFamily: string | null;
-  logoUrl: string | null;
-  bannerUrl: string | null;
 }
 
-/** La misma vista anotada con el rol del usuario actual (listado "mis orgs"). */
+/** La misma vista anotada con el rol del usuario actual (listado "mis gyms"). */
 export interface GymWithRoleView extends GymView {
   role: RoleSummary;
 }
@@ -27,10 +22,5 @@ export function toGymView(gym: Gym): GymView {
     slug: gym.slug,
     createdAt: gym.createdAt,
     trialEndsAt: gym.trialEndsAt ?? null,
-    primaryColor: gym.primaryColor ?? null,
-    secondaryColor: gym.secondaryColor ?? null,
-    fontFamily: gym.fontFamily ?? null,
-    logoUrl: gym.logoUrl ?? null,
-    bannerUrl: gym.bannerUrl ?? null,
   };
 }

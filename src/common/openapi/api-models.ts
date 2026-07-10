@@ -72,6 +72,20 @@ export class GymModel {
 
   @ApiProperty({ type: String, format: 'date-time', nullable: true, description: 'Cosmetic 7-day trial end.' })
   trialEndsAt: Date | null;
+}
+
+export class GymSettingsModel {
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ type: String, nullable: true, example: 'Acme Gym' })
+  displayName: string | null;
+
+  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/logo-x.png' })
+  logoUrl: string | null;
+
+  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/banner-x.png' })
+  bannerUrl: string | null;
 
   @ApiProperty({ type: String, nullable: true, example: '#0F62FE' })
   primaryColor: string | null;
@@ -82,11 +96,35 @@ export class GymModel {
   @ApiProperty({ type: String, nullable: true, example: 'Inter' })
   fontFamily: string | null;
 
-  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/logo-x.png' })
-  logoUrl: string | null;
+  @ApiProperty({ type: String, nullable: true, example: 'light' })
+  theme: string | null;
 
-  @ApiProperty({ type: String, nullable: true, example: 'http://localhost:9000/generic-saas/gym/abc/banner-x.png' })
-  bannerUrl: string | null;
+  @ApiProperty({ example: 'America/Argentina/Buenos_Aires' })
+  timezone: string;
+
+  @ApiProperty({ example: 'ARS' })
+  currency: string;
+
+  @ApiProperty({ type: Object, nullable: true })
+  openingHours: Record<string, unknown> | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'email' })
+  contactEmail: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  contactPhone: string | null;
+
+  @ApiProperty({ example: 5 })
+  moraGraceDays: number;
+
+  @ApiProperty({ example: 0 })
+  moraSurchargePct: number;
+
+  @ApiProperty({ type: Object, nullable: true })
+  renewalPolicy: Record<string, unknown> | null;
+
+  @ApiProperty({ type: String, isArray: true, example: ['CASH'] })
+  enabledPaymentMethods: string[];
 }
 
 export class GymWithRoleModel extends GymModel {

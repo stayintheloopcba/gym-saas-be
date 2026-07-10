@@ -1,11 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
-import { HEX_COLOR_REGEX, GYM_FONTS } from '../../domain/branding';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 /**
- * Actualización parcial de una organización: nombre y/o branding. Todos los campos
- * son opcionales; el use case aplica solo los provistos. Sustituye al antiguo
- * `RenameGymDto` (renombrar es ahora un update con solo `name`).
+ * Actualización parcial de un gym: solo `name`. El branding y los campos
+ * operativos se editan vía `PUT /gyms/:id/settings` (Decision #4 técnica).
  */
 export class UpdateGymDto {
   @ApiPropertyOptional({ example: 'Acme Corporation', minLength: 1, maxLength: 255 })
@@ -14,19 +12,4 @@ export class UpdateGymDto {
   @MinLength(1)
   @MaxLength(255)
   name?: string;
-
-  @ApiPropertyOptional({ example: '#0F62FE', description: 'Hex color #RRGGBB' })
-  @IsOptional()
-  @Matches(HEX_COLOR_REGEX, { message: 'primaryColor must be a hex color like #RRGGBB' })
-  primaryColor?: string;
-
-  @ApiPropertyOptional({ example: '#161616', description: 'Hex color #RRGGBB' })
-  @IsOptional()
-  @Matches(HEX_COLOR_REGEX, { message: 'secondaryColor must be a hex color like #RRGGBB' })
-  secondaryColor?: string;
-
-  @ApiPropertyOptional({ enum: GYM_FONTS })
-  @IsOptional()
-  @IsIn(GYM_FONTS as unknown as string[])
-  fontFamily?: string;
 }

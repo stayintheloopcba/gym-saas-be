@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GymSettingsModule } from '../gym-settings/gym-settings.module';
 import { MembersModule } from '../members/members.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { StorageModule } from '../storage/storage.module';
@@ -24,7 +25,7 @@ import { GymsController } from './interfaces/gyms.controller';
  * `OnboardingController`, parte de la capacidad `gym-context`.
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Gym]), MembersModule, PermissionsModule, StorageModule],
+  imports: [TypeOrmModule.forFeature([Gym]), MembersModule, PermissionsModule, StorageModule, GymSettingsModule],
   controllers: [GymsController, OnboardingController],
   providers: [
     { provide: GYM_REPOSITORY, useClass: TypeOrmGymRepository },

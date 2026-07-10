@@ -1,3 +1,5 @@
+import { GymSettings } from '../../gym-settings/domain/gym-settings.entity';
+import { GymSettingsRepository } from '../../gym-settings/domain/gym-settings.repository';
 import { GymPermissionService } from '../../permissions/application/gym-permission.service';
 import {
   ImageUploadValidator,
@@ -20,31 +22,38 @@ const pngFile = (overrides: Partial<UploadCandidate> = {}): UploadCandidate => (
 
 describe('SetGymImageUseCase', () => {
   let gyms: jest.Mocked<GymRepository>;
+  let settingsRepo: jest.Mocked<GymSettingsRepository>;
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let storage: jest.Mocked<FileStorage>;
   let useCase: SetGymImageUseCase;
 
-  const buildOrg = (): Gym =>
-    Object.assign(new Gym(), { id: 'gym-1', name: 'Acme', slug: 'acme', logoUrl: null, bannerUrl: null });
+  const buildGym = (): Gym => Object.assign(new Gym(), { id: 'gym-1', name: 'Acme', slug: 'acme' });
+  const buildSettings = (): GymSettings =>
+    Object.assign(new GymSettings(), { gymId: 'gym-1', logoUrl: null, bannerUrl: null });
 
   beforeEach(() => {
     gyms = {
-      findById: jest.fn().mockResolvedValue(buildOrg()),
+      findById: jest.fn().mockResolvedValue(buildGym()),
       findBySlug: jest.fn(),
-      save: jest.fn((org: Gym) => Promise.resolve(org)),
+      save: jest.fn((gym: Gym) => Promise.resolve(gym)),
       softDelete: jest.fn(),
+    };
+    settingsRepo = {
+      findByGymId: jest.fn().mockResolvedValue(buildSettings()),
+      save: jest.fn((settings: GymSettings) => Promise.resolve(settings)),
     };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     storage = { put: jest.fn().mockResolvedValue('https://minio/generic-saas/gym/gym-1/logo-x.png') };
     useCase = new SetGymImageUseCase(
       gyms,
+      settingsRepo,
       permissions as unknown as GymPermissionService,
       storage,
       new ImageUploadValidator(),
     );
   });
 
-  it('uploads a logo and persists its URL', async () => {
+  it('uploads a logo and persists its URL on GymSettings', async () => {
     const updated = await useCase.execute('u1', 'gym-1', 'logo', pngFile());
 
     expect(storage.put).toHaveBeenCalledWith(
@@ -60,6 +69,14 @@ describe('SetGymImageUseCase', () => {
 
     expect(updated.bannerUrl).toBe('https://minio/generic-saas/gym/gym-1/banner-x.png');
     expect(updated.logoUrl).toBeNull();
+  });
+
+  it('creates GymSettings on first upload when none existed', async () => {
+    settingsRepo.findByGymId.mockResolvedValue(null);
+
+    const updated = await useCase.execute('u1', 'gym-1', 'logo', pngFile());
+
+    expect(updated.logoUrl).toBe('https://minio/generic-saas/gym/gym-1/logo-x.png');
   });
 
   it('requires GYM_UPDATE before uploading', async () => {

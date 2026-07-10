@@ -6,18 +6,15 @@ import { GymNotFoundError } from '../domain/gym.errors';
 import { GYM_REPOSITORY } from '../domain/gym.repository';
 import type { GymRepository } from '../domain/gym.repository';
 
-/** Campos editables de una organización (parcial). */
+/** Campos editables de un gym (parcial). Branding vive en `GymSettings`. */
 export interface UpdateGymCommand {
   name?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  fontFamily?: string;
 }
 
 /**
- * Actualiza nombre y/o branding de una organización. Requiere `GYM_UPDATE`
- * del llamador. Aplica solo los campos provistos (update parcial). Reemplaza al
- * antiguo `RenameGymUseCase`.
+ * Actualiza el nombre de un gym. Requiere `GYM_UPDATE` del llamador. Aplica
+ * solo los campos provistos (update parcial). Reemplaza al antiguo
+ * `RenameGymUseCase`.
  */
 @Injectable()
 export class UpdateGymUseCase {
@@ -36,15 +33,6 @@ export class UpdateGymUseCase {
 
     if (patch.name !== undefined) {
       gym.name = patch.name.trim();
-    }
-    if (patch.primaryColor !== undefined) {
-      gym.primaryColor = patch.primaryColor;
-    }
-    if (patch.secondaryColor !== undefined) {
-      gym.secondaryColor = patch.secondaryColor;
-    }
-    if (patch.fontFamily !== undefined) {
-      gym.fontFamily = patch.fontFamily;
     }
 
     return this.gyms.save(gym);

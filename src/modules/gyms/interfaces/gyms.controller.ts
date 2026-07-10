@@ -22,6 +22,7 @@ import { ApiImageUpload } from '../../../common/openapi/api-image-upload.decorat
 import {
   ErrorResponseModel,
   GymModel,
+  GymSettingsModel,
   GymWithRoleModel,
   SuccessResponseModel,
 } from '../../../common/openapi/api-models';
@@ -52,13 +53,14 @@ import { ActiveGymCookie } from './active-gym-cookie';
 import { CreateGymDto } from './dto/create-gym.dto';
 import { UpdateGymDto } from './dto/update-gym.dto';
 import { GymView, GymWithRoleView, toGymView } from './gym.view';
+import type { GymSettingsView } from '../../gym-settings/interfaces/gym-settings.view';
 
 /**
- * Endpoints de organizaciones y selección de organización activa.
+ * Endpoints de gyms y selección de gym activo.
  *
  * Todas las rutas exigen JWT (no `ActiveGymGuard`): son rutas de cuenta/onboarding
- * — un usuario sin organización todavía necesita poder crear o listar las suyas.
- * La validación del par (usuario, org) la hacen el guard y los casos de uso
+ * — un usuario sin gym todavía necesita poder crear o listar los suyos. La
+ * validación del par (usuario, gym) la hacen el guard y los casos de uso
  * mediante permisos granulares.
  */
 @Controller('gyms')
@@ -122,7 +124,7 @@ export class GymsController {
 
   @Patch(':id')
   @RequirePermissions(PERMISSIONS.GYM_UPDATE)
-  @ApiOperation({ summary: 'Update a gym name and/or branding' })
+  @ApiOperation({ summary: 'Update a gym name' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: GymModel })
   @ApiBadRequestResponse({ type: ErrorResponseModel })
@@ -139,35 +141,35 @@ export class GymsController {
   @Post(':id/logo')
   @RequirePermissions(PERMISSIONS.GYM_UPDATE)
   @ApiImageUpload()
-  @ApiOperation({ summary: "Upload the gym's logo image" })
+  @ApiOperation({ summary: "Upload the gym's logo image (persisted on GymSettings)" })
   @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiCreatedResponse({ type: GymModel })
+  @ApiCreatedResponse({ type: GymSettingsModel })
   @ApiBadRequestResponse({ type: ErrorResponseModel })
   @ApiForbiddenResponse({ type: ErrorResponseModel })
   @ApiNotFoundResponse({ type: ErrorResponseModel })
-  async uploadLogo(
+  uploadLogo(
     @CurrentUser() user: UserPublicProfile,
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<GymView> {
-    return toGymView(await this.setGymImage.execute(user.id, id, 'logo', file));
+  ): Promise<GymSettingsView> {
+    return this.setGymImage.execute(user.id, id, 'logo', file);
   }
 
   @Post(':id/banner')
   @RequirePermissions(PERMISSIONS.GYM_UPDATE)
   @ApiImageUpload()
-  @ApiOperation({ summary: "Upload the gym's banner image" })
+  @ApiOperation({ summary: "Upload the gym's banner image (persisted on GymSettings)" })
   @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiCreatedResponse({ type: GymModel })
+  @ApiCreatedResponse({ type: GymSettingsModel })
   @ApiBadRequestResponse({ type: ErrorResponseModel })
   @ApiForbiddenResponse({ type: ErrorResponseModel })
   @ApiNotFoundResponse({ type: ErrorResponseModel })
-  async uploadBanner(
+  uploadBanner(
     @CurrentUser() user: UserPublicProfile,
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<GymView> {
-    return toGymView(await this.setGymImage.execute(user.id, id, 'banner', file));
+  ): Promise<GymSettingsView> {
+    return this.setGymImage.execute(user.id, id, 'banner', file);
   }
 
   @Delete(':id')

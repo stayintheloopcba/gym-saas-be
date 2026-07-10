@@ -9,35 +9,30 @@ describe('UpdateGymUseCase', () => {
   let permissions: jest.Mocked<Pick<GymPermissionService, 'requirePermission'>>;
   let useCase: UpdateGymUseCase;
 
-  const buildOrg = (): Gym =>
-    Object.assign(new Gym(), {
-      id: 'gym-1',
-      name: 'Acme',
-      slug: 'acme',
-      primaryColor: null,
-      secondaryColor: null,
-      fontFamily: null,
-    });
+  const buildGym = (): Gym => Object.assign(new Gym(), { id: 'gym-1', name: 'Acme', slug: 'acme' });
 
   beforeEach(() => {
     gyms = {
-      findById: jest.fn().mockResolvedValue(buildOrg()),
+      findById: jest.fn().mockResolvedValue(buildGym()),
       findBySlug: jest.fn(),
-      save: jest.fn((org: Gym) => Promise.resolve(org)),
+      save: jest.fn((gym: Gym) => Promise.resolve(gym)),
       softDelete: jest.fn(),
     };
     permissions = { requirePermission: jest.fn().mockResolvedValue(undefined) };
     useCase = new UpdateGymUseCase(gyms, permissions as unknown as GymPermissionService);
   });
 
-  it('applies only the provided fields', async () => {
-    const updated = await useCase.execute('u1', 'gym-1', { primaryColor: '#0F62FE', fontFamily: 'Inter' });
+  it('applies the provided name', async () => {
+    const updated = await useCase.execute('u1', 'gym-1', { name: 'Acme Corp' });
 
-    expect(updated.primaryColor).toBe('#0F62FE');
-    expect(updated.fontFamily).toBe('Inter');
-    // name no provisto → se conserva
-    expect(updated.name).toBe('Acme');
+    expect(updated.name).toBe('Acme Corp');
     expect(gyms.save).toHaveBeenCalled();
+  });
+
+  it('leaves the name untouched when not provided', async () => {
+    const updated = await useCase.execute('u1', 'gym-1', {});
+
+    expect(updated.name).toBe('Acme');
   });
 
   it('requires GYM_UPDATE before mutating', async () => {

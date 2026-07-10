@@ -10,6 +10,7 @@ import { buildTypeOrmConfig } from './config/database.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { MembersModule } from './modules/members/members.module';
+import { GymSettingsModule } from './modules/gym-settings/gym-settings.module';
 import { GymsModule } from './modules/gyms/gyms.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
@@ -35,6 +36,7 @@ import { UsersModule } from './modules/users/users.module';
     MembersModule,
     RolesModule,
     GymsModule,
+    GymSettingsModule,
     StorageModule,
   ],
   controllers: [AppController],
