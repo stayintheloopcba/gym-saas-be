@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MEMBERSHIP_CONTEXT_PORT } from '../../common/context/membership-context.port';
+import { Member } from '../members/domain/member.entity';
 import { UsersModule } from '../users/users.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { ChangeMemberRoleUseCase } from './application/change-member-role.use-case';
@@ -21,7 +22,7 @@ import { MembersController } from './interfaces/members.controller';
  * de TypeORM.
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Membership]), UsersModule, PermissionsModule],
+  imports: [TypeOrmModule.forFeature([Membership, Member]), UsersModule, PermissionsModule],
   controllers: [MembersController],
   providers: [
     { provide: MEMBERSHIP_REPOSITORY, useClass: TypeOrmMembershipRepository },

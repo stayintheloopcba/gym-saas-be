@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionGuard } from '../../common/guards/permission.guard';
-import { Membership } from '../memberships/domain/membership.entity';
+import { Member } from '../members/domain/member.entity';
 import { GymPermissionService } from './application/gym-permission.service';
 import { OwnershipContextService } from './application/ownership-context.service';
 import { Permission } from './domain/permission.entity';
@@ -17,7 +17,7 @@ import { TypeOrmRolePermissionRepository } from './infrastructure/typeorm-role-p
 import { OwnershipValidatorRegistry } from './ownership/ownership-validator-registry';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Membership, Role, Permission, RolePermission])],
+  imports: [TypeOrmModule.forFeature([Member, Role, Permission, RolePermission])],
   providers: [
     { provide: PERMISSION_REPOSITORY, useClass: TypeOrmPermissionRepository },
     { provide: ROLE_PERMISSION_REPOSITORY, useClass: TypeOrmRolePermissionRepository },

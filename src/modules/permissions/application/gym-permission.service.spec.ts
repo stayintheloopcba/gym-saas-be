@@ -1,10 +1,10 @@
 import { HierarchyLevel } from '../../../common/enums/hierarchy-level.enum';
 import { PERMISSIONS } from '../domain/permission-key';
 import { PermissionDeniedError } from '../domain/permission.errors';
-import { MembershipRoleInfo, PermissionRepository } from '../domain/permission.repository';
+import { MemberRoleInfo, PermissionRepository } from '../domain/permission.repository';
 import { GymPermissionService } from './gym-permission.service';
 
-const roleInfo = (overrides: Partial<MembershipRoleInfo> = {}): MembershipRoleInfo => ({
+const roleInfo = (overrides: Partial<MemberRoleInfo> = {}): MemberRoleInfo => ({
   roleId: 'role-1',
   roleKey: 'admin',
   roleName: 'Administrador',
@@ -18,7 +18,7 @@ describe('GymPermissionService', () => {
 
   beforeEach(() => {
     repository = {
-      findMembershipRole: jest.fn(),
+      findMemberRole: jest.fn(),
       findPermissionCodes: jest.fn().mockResolvedValue([]),
       findRoleSummary: jest.fn(),
     };
@@ -26,21 +26,21 @@ describe('GymPermissionService', () => {
   });
 
   it('grants a permission the role has in role_permissions', async () => {
-    repository.findMembershipRole.mockResolvedValue(roleInfo());
+    repository.findMemberRole.mockResolvedValue(roleInfo());
     repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.MEMBERS_REMOVE]);
 
     await expect(service.checkPermission('user-1', 'gym-1', PERMISSIONS.MEMBERS_REMOVE)).resolves.toBe(true);
   });
 
   it('denies a permission absent from role_permissions', async () => {
-    repository.findMembershipRole.mockResolvedValue(roleInfo());
+    repository.findMemberRole.mockResolvedValue(roleInfo());
     repository.findPermissionCodes.mockResolvedValue([]);
 
     await expect(service.checkPermission('user-1', 'gym-1', PERMISSIONS.SETTINGS_UPDATE)).resolves.toBe(false);
   });
 
-  it('denies users without an active membership', async () => {
-    repository.findMembershipRole.mockResolvedValue(null);
+  it('denies users without an active Member', async () => {
+    repository.findMemberRole.mockResolvedValue(null);
 
     await expect(service.requirePermission('user-1', 'gym-1', PERMISSIONS.GYM_READ)).rejects.toBeInstanceOf(
       PermissionDeniedError,
@@ -49,7 +49,7 @@ describe('GymPermissionService', () => {
   });
 
   it('supports OR logic for multiple permissions', async () => {
-    repository.findMembershipRole.mockResolvedValue(roleInfo());
+    repository.findMemberRole.mockResolvedValue(roleInfo());
     repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.GYM_READ]);
 
     await expect(
@@ -58,15 +58,15 @@ describe('GymPermissionService', () => {
   });
 
   describe('getEffectivePermissions', () => {
-    it('returns null for a user without an active membership', async () => {
-      repository.findMembershipRole.mockResolvedValue(null);
+    it('returns null for a user without an active Member', async () => {
+      repository.findMemberRole.mockResolvedValue(null);
 
       await expect(service.getEffectivePermissions('user-1', 'gym-1')).resolves.toBeNull();
       expect(repository.findPermissionCodes).not.toHaveBeenCalled();
     });
 
     it('returns exactly the permission codes granted by the role', async () => {
-      repository.findMembershipRole.mockResolvedValue(
+      repository.findMemberRole.mockResolvedValue(
         roleInfo({ roleId: 'role-viewer', roleKey: 'receptionist', roleName: 'Recepcionista' }),
       );
       repository.findPermissionCodes.mockResolvedValue([PERMISSIONS.GYM_READ, PERMISSIONS.MEMBERS_READ]);

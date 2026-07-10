@@ -6,7 +6,7 @@ import { PERMISSION_REPOSITORY } from '../domain/permission.repository';
 import type { PermissionRepository } from '../domain/permission.repository';
 import { RoleSummary } from '../domain/role-summary';
 
-/** Permisos efectivos del usuario en una organización, para consumo del frontend. */
+/** Permisos efectivos del usuario en un gym, para consumo del frontend. */
 export interface EffectivePermissions {
   role: RoleSummary;
   /** Alcance de datos del usuario (SELF / GYM / GLOBAL). */
@@ -15,9 +15,9 @@ export interface EffectivePermissions {
 }
 
 /**
- * Resuelve el permiso efectivo de un usuario en una organización: lookup
- * directo `membership.roleId → role_permissions`. Sin overrides, sin deny,
- * sin precedencia (ver design Decision 5).
+ * Resuelve el permiso efectivo de un usuario en un gym: lookup directo
+ * `member.roleId → role_permissions`. Sin overrides, sin deny, sin
+ * precedencia (ver design Decision 5).
  */
 @Injectable()
 export class GymPermissionService {
@@ -28,13 +28,13 @@ export class GymPermissionService {
     gymId: string,
     permission: PermissionKey | readonly PermissionKey[],
   ): Promise<boolean> {
-    const membershipRole = await this.permissions.findMembershipRole(userId, gymId);
-    if (!membershipRole) {
+    const memberRole = await this.permissions.findMemberRole(userId, gymId);
+    if (!memberRole) {
       return false;
     }
 
     const codes = Array.isArray(permission) ? permission : [permission];
-    const granted = new Set(await this.permissions.findPermissionCodes(membershipRole.roleId));
+    const granted = new Set(await this.permissions.findPermissionCodes(memberRole.roleId));
 
     // Semántica OR: alcanza con que un código esté otorgado.
     return codes.some((code) => granted.has(code));
@@ -51,21 +51,21 @@ export class GymPermissionService {
   }
 
   /**
-   * Devuelve el contexto de permisos efectivos del usuario en la organización:
-   * su rol del catálogo y todos los códigos que ese rol otorga. Si no es
-   * miembro de la org, devuelve `null`.
+   * Devuelve el contexto de permisos efectivos del usuario en el gym: su rol
+   * del catálogo y todos los códigos que ese rol otorga. Si no tiene un
+   * `Member` en el gym, devuelve `null`.
    */
   async getEffectivePermissions(userId: string, gymId: string): Promise<EffectivePermissions | null> {
-    const membershipRole = await this.permissions.findMembershipRole(userId, gymId);
-    if (!membershipRole) {
+    const memberRole = await this.permissions.findMemberRole(userId, gymId);
+    if (!memberRole) {
       return null;
     }
 
-    const permissions = await this.permissions.findPermissionCodes(membershipRole.roleId);
+    const permissions = await this.permissions.findPermissionCodes(memberRole.roleId);
 
     return {
-      role: { id: membershipRole.roleId, key: membershipRole.roleKey, name: membershipRole.roleName },
-      hierarchyLevel: membershipRole.hierarchyLevel,
+      role: { id: memberRole.roleId, key: memberRole.roleKey, name: memberRole.roleName },
+      hierarchyLevel: memberRole.hierarchyLevel,
       permissions: permissions as PermissionKey[],
     };
   }

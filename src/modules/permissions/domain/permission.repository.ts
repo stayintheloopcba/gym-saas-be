@@ -3,8 +3,8 @@ import { RoleSummary } from './role-summary';
 
 export const PERMISSION_REPOSITORY = Symbol('PERMISSION_REPOSITORY');
 
-/** El rol del catálogo asignado a la membresía del usuario en la organización. */
-export interface MembershipRoleInfo {
+/** El rol del catálogo asignado al `Member` del usuario en el gym. */
+export interface MemberRoleInfo {
   roleId: string;
   roleKey: string;
   roleName: string;
@@ -12,13 +12,13 @@ export interface MembershipRoleInfo {
 }
 
 /**
- * Port de lectura para la evaluación de permisos: resuelve el rol de una
- * membresía y los códigos de permiso que ese rol otorga (`role_permissions`).
+ * Port de lectura para la evaluación de permisos: resuelve el rol de un
+ * `Member` y los códigos de permiso que ese rol otorga (`role_permissions`).
  * Lookup directo, sin overrides ni precedencia.
  */
 export interface PermissionRepository {
-  /** Rol del catálogo de la membresía del usuario en la organización, o `null` si no es miembro. */
-  findMembershipRole(userId: string, gymId: string): Promise<MembershipRoleInfo | null>;
+  /** Rol del catálogo del `Member` del usuario en el gym, o `null` si no es miembro. */
+  findMemberRole(userId: string, gymId: string): Promise<MemberRoleInfo | null>;
   /** Códigos de permiso otorgados a un rol. */
   findPermissionCodes(roleId: string): Promise<string[]>;
   /** Forma resumida de un rol del catálogo, o `null` si no existe. */
