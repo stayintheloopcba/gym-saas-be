@@ -41,7 +41,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 15 | `Subscriptions` module | 5, 14 | [x] |
 | 16 | `Payments` module | 10, 15 | [x] |
 | 17 | Derived overdue on read | 16 | [x] |
-| 18 | `AccessLogs` module | 11, 17 | [ ] |
+| 18 | `AccessLogs` module | 11, 17 | [x] |
 | 19 | `Routines` module | 5 | [ ] |
 | 20 | Routine assignments | 19 | [ ] |
 | 21 | `Progress` module | 19 | [ ] |
