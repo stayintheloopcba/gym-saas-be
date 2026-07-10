@@ -1,7 +1,7 @@
 export const PERMISSIONS = {
-  ORGANIZATION_READ: 'organization:read',
-  ORGANIZATION_UPDATE: 'organization:update',
-  ORGANIZATION_DELETE: 'organization:delete',
+  GYM_READ: 'gym:read',
+  GYM_UPDATE: 'gym:update',
+  GYM_DELETE: 'gym:delete',
   MEMBERS_READ: 'members:read',
   MEMBERS_UPDATE_ROLE: 'members:update_role',
   MEMBERS_REMOVE: 'members:remove',

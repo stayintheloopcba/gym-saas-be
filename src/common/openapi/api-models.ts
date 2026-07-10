@@ -122,7 +122,7 @@ export class MyPermissionsModel {
     type: String,
     isArray: true,
     description: 'Effective permission codes (resource:action) granted to the current user.',
-    example: ['organization:read', 'members:read', 'resources:create'],
+    example: ['gym:read', 'members:read', 'resources:create'],
   })
   permissions: string[];
 }

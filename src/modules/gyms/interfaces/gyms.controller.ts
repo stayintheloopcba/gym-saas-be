@@ -110,7 +110,7 @@ export class GymsController {
   }
 
   @Get(':id')
-  @RequirePermissions(PERMISSIONS.ORGANIZATION_READ)
+  @RequirePermissions(PERMISSIONS.GYM_READ)
   @ApiOperation({ summary: 'Get a gym where the user is an active member' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: GymModel })
@@ -121,7 +121,7 @@ export class GymsController {
   }
 
   @Patch(':id')
-  @RequirePermissions(PERMISSIONS.ORGANIZATION_UPDATE)
+  @RequirePermissions(PERMISSIONS.GYM_UPDATE)
   @ApiOperation({ summary: 'Update a gym name and/or branding' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: GymModel })
@@ -137,7 +137,7 @@ export class GymsController {
   }
 
   @Post(':id/logo')
-  @RequirePermissions(PERMISSIONS.ORGANIZATION_UPDATE)
+  @RequirePermissions(PERMISSIONS.GYM_UPDATE)
   @ApiImageUpload()
   @ApiOperation({ summary: "Upload the gym's logo image" })
   @ApiParam({ name: 'id', format: 'uuid' })
@@ -154,7 +154,7 @@ export class GymsController {
   }
 
   @Post(':id/banner')
-  @RequirePermissions(PERMISSIONS.ORGANIZATION_UPDATE)
+  @RequirePermissions(PERMISSIONS.GYM_UPDATE)
   @ApiImageUpload()
   @ApiOperation({ summary: "Upload the gym's banner image" })
   @ApiParam({ name: 'id', format: 'uuid' })
@@ -171,7 +171,7 @@ export class GymsController {
   }
 
   @Delete(':id')
-  @RequirePermissions(PERMISSIONS.ORGANIZATION_DELETE)
+  @RequirePermissions(PERMISSIONS.GYM_DELETE)
   @ApiOperation({ summary: 'Soft-delete a gym' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiNoContentResponse()

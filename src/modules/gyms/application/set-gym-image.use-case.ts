@@ -16,7 +16,7 @@ export type GymImageTarget = 'logo' | 'banner';
 /**
  * Sube el logo o el banner de una organización a MinIO y persiste su URL.
  *
- * Requiere `ORGANIZATION_UPDATE` del llamador. Valida tipo y tamaño de la imagen
+ * Requiere `GYM_UPDATE` del llamador. Valida tipo y tamaño de la imagen
  * (`ImageUploadValidator`) y genera una key con uuid para evitar enumeración y
  * cache stale (`gym/<id>/<target>-<uuid>.<ext>`).
  */
@@ -35,7 +35,7 @@ export class SetGymImageUseCase {
     target: GymImageTarget,
     file: UploadCandidate | undefined,
   ): Promise<Gym> {
-    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.ORGANIZATION_UPDATE);
+    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.GYM_UPDATE);
     this.validator.validate(file);
 
     const gym = await this.gyms.findById(gymId);

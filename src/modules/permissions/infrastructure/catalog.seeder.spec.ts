@@ -51,7 +51,7 @@ describe('CatalogSeeder', () => {
     expect(roleRepository.save).toHaveBeenCalledTimes(4);
     // owner gets every permission in the catalog.
     expect(rolePermissionRepository.save).toHaveBeenCalledWith(
-      expect.objectContaining({ roleId: 'role-owner', permissionCode: PERMISSIONS.ORGANIZATION_DELETE }),
+      expect.objectContaining({ roleId: 'role-owner', permissionCode: PERMISSIONS.GYM_DELETE }),
     );
   });
 

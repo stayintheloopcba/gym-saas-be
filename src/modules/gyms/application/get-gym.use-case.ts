@@ -18,7 +18,7 @@ export class GetGymUseCase {
   ) {}
 
   async execute(callerUserId: string, gymId: string): Promise<Gym> {
-    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.ORGANIZATION_READ);
+    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.GYM_READ);
 
     const gym = await this.gyms.findById(gymId);
     if (!gym) {

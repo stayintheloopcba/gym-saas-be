@@ -74,7 +74,7 @@ export class CatalogSeeder implements OnApplicationBootstrap {
   }
 
   private roleSeeds(): RoleSeed[] {
-    const allExceptOrgDelete = ALL_PERMISSIONS.filter((code) => code !== PERMISSIONS.ORGANIZATION_DELETE);
+    const allExceptGymDelete = ALL_PERMISSIONS.filter((code) => code !== PERMISSIONS.GYM_DELETE);
 
     return [
       { key: 'owner', name: 'Dueño', hierarchyLevel: HierarchyLevel.GYM, permissions: ALL_PERMISSIONS },
@@ -82,14 +82,14 @@ export class CatalogSeeder implements OnApplicationBootstrap {
         key: 'admin',
         name: 'Administrador',
         hierarchyLevel: HierarchyLevel.GYM,
-        permissions: allExceptOrgDelete,
+        permissions: allExceptGymDelete,
       },
       {
         key: 'receptionist',
         name: 'Recepcionista',
         hierarchyLevel: HierarchyLevel.GYM,
         permissions: [
-          PERMISSIONS.ORGANIZATION_READ,
+          PERMISSIONS.GYM_READ,
           PERMISSIONS.MEMBERS_READ,
           PERMISSIONS.SETTINGS_READ,
           PERMISSIONS.ROLES_READ,
@@ -100,23 +100,23 @@ export class CatalogSeeder implements OnApplicationBootstrap {
         key: 'instructor',
         name: 'Instructor',
         hierarchyLevel: HierarchyLevel.SELF,
-        permissions: [PERMISSIONS.ORGANIZATION_READ, PERMISSIONS.MEMBERS_READ, PERMISSIONS.SETTINGS_READ],
+        permissions: [PERMISSIONS.GYM_READ, PERMISSIONS.MEMBERS_READ, PERMISSIONS.SETTINGS_READ],
       },
     ];
   }
 
   private permissionDefinitions(): Record<PermissionKey, { name: string; description: string }> {
     return {
-      'organization:read': { name: 'Read organization', description: 'Read organization details' },
-      'organization:update': { name: 'Update organization', description: 'Update organization details' },
-      'organization:delete': { name: 'Delete organization', description: 'Delete an organization' },
-      'members:read': { name: 'Read members', description: 'Read organization members' },
+      'gym:read': { name: 'Read gym', description: 'Read gym details' },
+      'gym:update': { name: 'Update gym', description: 'Update gym details' },
+      'gym:delete': { name: 'Delete gym', description: 'Delete a gym' },
+      'members:read': { name: 'Read members', description: 'Read gym members' },
       'members:update_role': { name: 'Update member roles', description: 'Change member roles' },
       'members:remove': { name: 'Remove members', description: 'Remove gym members' },
       'roles:read': { name: 'Read roles', description: 'Read the role catalog' },
       'users:read': { name: 'Read users', description: 'Read user profiles' },
-      'settings:read': { name: 'Read settings', description: 'Read organization settings' },
-      'settings:update': { name: 'Update settings', description: 'Update organization settings' },
+      'settings:read': { name: 'Read settings', description: 'Read gym settings' },
+      'settings:update': { name: 'Update settings', description: 'Update gym settings' },
     };
   }
 }

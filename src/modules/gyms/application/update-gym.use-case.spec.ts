@@ -40,7 +40,7 @@ describe('UpdateGymUseCase', () => {
     expect(gyms.save).toHaveBeenCalled();
   });
 
-  it('requires ORGANIZATION_UPDATE before mutating', async () => {
+  it('requires GYM_UPDATE before mutating', async () => {
     permissions.requirePermission.mockRejectedValue(new Error('forbidden'));
 
     await expect(useCase.execute('u1', 'gym-1', { name: 'New' })).rejects.toThrow('forbidden');

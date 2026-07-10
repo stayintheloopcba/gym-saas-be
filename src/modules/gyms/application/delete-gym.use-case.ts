@@ -17,7 +17,7 @@ export class DeleteGymUseCase {
   ) {}
 
   async execute(callerUserId: string, gymId: string): Promise<void> {
-    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.ORGANIZATION_DELETE);
+    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.GYM_DELETE);
 
     const gym = await this.gyms.findById(gymId);
     if (!gym) {

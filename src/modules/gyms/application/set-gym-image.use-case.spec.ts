@@ -62,7 +62,7 @@ describe('SetGymImageUseCase', () => {
     expect(updated.logoUrl).toBeNull();
   });
 
-  it('requires ORGANIZATION_UPDATE before uploading', async () => {
+  it('requires GYM_UPDATE before uploading', async () => {
     permissions.requirePermission.mockRejectedValue(new Error('forbidden'));
 
     await expect(useCase.execute('u1', 'gym-1', 'logo', pngFile())).rejects.toThrow('forbidden');

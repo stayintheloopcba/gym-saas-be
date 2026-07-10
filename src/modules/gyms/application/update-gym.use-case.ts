@@ -15,7 +15,7 @@ export interface UpdateGymCommand {
 }
 
 /**
- * Actualiza nombre y/o branding de una organización. Requiere `ORGANIZATION_UPDATE`
+ * Actualiza nombre y/o branding de una organización. Requiere `GYM_UPDATE`
  * del llamador. Aplica solo los campos provistos (update parcial). Reemplaza al
  * antiguo `RenameGymUseCase`.
  */
@@ -27,7 +27,7 @@ export class UpdateGymUseCase {
   ) {}
 
   async execute(callerUserId: string, gymId: string, patch: UpdateGymCommand): Promise<Gym> {
-    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.ORGANIZATION_UPDATE);
+    await this.permissions.requirePermission(callerUserId, gymId, PERMISSIONS.GYM_UPDATE);
 
     const gym = await this.gyms.findById(gymId);
     if (!gym) {
