@@ -18,7 +18,7 @@ const ALL_PERMISSIONS: readonly PermissionKey[] = Object.values(PERMISSIONS);
 
 /**
  * Siembra el catálogo global al bootstrap: los códigos de permiso y los roles
- * iniciales (`owner`/`admin`/`receptionist`/`instructor`) con sus
+ * iniciales (`owner`/`admin`/`receptionist`/`instructor`/`student`) con sus
  * `role_permissions`. Todo idempotente por clave natural (`code` / `key`):
  * un rol ya existente (y sus permisos) se deja intacto, así las ediciones de
  * un platform admin sobreviven a un reinicio.
@@ -76,6 +76,15 @@ export class CatalogSeeder implements OnApplicationBootstrap {
   private roleSeeds(): RoleSeed[] {
     const allExceptGymDelete = ALL_PERMISSIONS.filter((code) => code !== PERMISSIONS.GYM_DELETE);
 
+    const readAll = [
+      PERMISSIONS.GYM_READ,
+      PERMISSIONS.SETTINGS_READ,
+      PERMISSIONS.BRANCHES_READ,
+      PERMISSIONS.PLANS_READ,
+      PERMISSIONS.ROLES_READ,
+      PERMISSIONS.USERS_READ,
+    ];
+
     return [
       { key: 'owner', name: 'Dueño', hierarchyLevel: HierarchyLevel.GYM, permissions: ALL_PERMISSIONS },
       {
@@ -89,20 +98,48 @@ export class CatalogSeeder implements OnApplicationBootstrap {
         name: 'Recepcionista',
         hierarchyLevel: HierarchyLevel.GYM,
         permissions: [
-          PERMISSIONS.GYM_READ,
+          ...readAll,
           PERMISSIONS.MEMBERS_READ,
           PERMISSIONS.MEMBERS_CREATE,
           PERMISSIONS.MEMBERS_UPDATE,
-          PERMISSIONS.SETTINGS_READ,
-          PERMISSIONS.ROLES_READ,
-          PERMISSIONS.USERS_READ,
+          PERMISSIONS.SUBSCRIPTIONS_READ,
+          PERMISSIONS.SUBSCRIPTIONS_MANAGE,
+          PERMISSIONS.PAYMENTS_READ,
+          PERMISSIONS.PAYMENTS_RECORD,
+          PERMISSIONS.ACCESS_READ,
+          PERMISSIONS.ACCESS_CHECKIN,
         ],
       },
       {
         key: 'instructor',
         name: 'Instructor',
         hierarchyLevel: HierarchyLevel.SELF,
-        permissions: [PERMISSIONS.GYM_READ, PERMISSIONS.MEMBERS_READ, PERMISSIONS.SETTINGS_READ],
+        permissions: [
+          ...readAll,
+          PERMISSIONS.MEMBERS_READ,
+          PERMISSIONS.ROUTINES_READ,
+          PERMISSIONS.ROUTINES_MANAGE,
+          PERMISSIONS.ROUTINES_ASSIGN,
+          PERMISSIONS.PROGRESS_READ,
+          PERMISSIONS.PROGRESS_RECORD,
+        ],
+      },
+      {
+        key: 'student',
+        name: 'Alumno',
+        hierarchyLevel: HierarchyLevel.SELF,
+        permissions: [
+          ...readAll,
+          PERMISSIONS.MEMBERS_READ,
+          PERMISSIONS.SUBSCRIPTIONS_READ,
+          PERMISSIONS.PAYMENTS_READ,
+          PERMISSIONS.ACCESS_READ,
+          PERMISSIONS.ROUTINES_READ,
+          PERMISSIONS.ROUTINES_MANAGE,
+          PERMISSIONS.ROUTINES_ASSIGN,
+          PERMISSIONS.PROGRESS_READ,
+          PERMISSIONS.PROGRESS_RECORD,
+        ],
       },
     ];
   }
@@ -121,6 +158,25 @@ export class CatalogSeeder implements OnApplicationBootstrap {
       'users:read': { name: 'Read users', description: 'Read user profiles' },
       'settings:read': { name: 'Read settings', description: 'Read gym settings' },
       'settings:update': { name: 'Update settings', description: 'Update gym settings' },
+      'branches:read': { name: 'Read branches', description: 'Read gym branches' },
+      'branches:manage': { name: 'Manage branches', description: 'Create, update and remove branches' },
+      'plans:read': { name: 'Read plans', description: 'Read membership plans' },
+      'plans:manage': { name: 'Manage plans', description: 'Create, update and remove membership plans' },
+      'subscriptions:read': { name: 'Read subscriptions', description: 'Read member subscriptions' },
+      'subscriptions:manage': {
+        name: 'Manage subscriptions',
+        description: 'Create and update member subscriptions',
+      },
+      'payments:read': { name: 'Read payments', description: 'Read recorded payments' },
+      'payments:record': { name: 'Record payments', description: 'Record a payment for a subscription' },
+      'payments:void': { name: 'Void payments', description: 'Void a recorded payment' },
+      'access:read': { name: 'Read access logs', description: 'Read check-in/access history' },
+      'access:checkin': { name: 'Check in members', description: 'Record a manual member check-in' },
+      'routines:read': { name: 'Read routines', description: 'Read routine templates and assignments' },
+      'routines:manage': { name: 'Manage routines', description: 'Create, update and remove routines' },
+      'routines:assign': { name: 'Assign routines', description: 'Assign or unassign a routine to a member' },
+      'progress:read': { name: 'Read progress', description: "Read a member's training progress" },
+      'progress:record': { name: 'Record progress', description: 'Record training progress entries' },
     };
   }
 }

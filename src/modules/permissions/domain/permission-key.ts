@@ -11,6 +11,22 @@ export const PERMISSIONS = {
   USERS_READ: 'users:read',
   SETTINGS_READ: 'settings:read',
   SETTINGS_UPDATE: 'settings:update',
+  BRANCHES_READ: 'branches:read',
+  BRANCHES_MANAGE: 'branches:manage',
+  PLANS_READ: 'plans:read',
+  PLANS_MANAGE: 'plans:manage',
+  SUBSCRIPTIONS_READ: 'subscriptions:read',
+  SUBSCRIPTIONS_MANAGE: 'subscriptions:manage',
+  PAYMENTS_READ: 'payments:read',
+  PAYMENTS_RECORD: 'payments:record',
+  PAYMENTS_VOID: 'payments:void',
+  ACCESS_READ: 'access:read',
+  ACCESS_CHECKIN: 'access:checkin',
+  ROUTINES_READ: 'routines:read',
+  ROUTINES_MANAGE: 'routines:manage',
+  ROUTINES_ASSIGN: 'routines:assign',
+  PROGRESS_READ: 'progress:read',
+  PROGRESS_RECORD: 'progress:record',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
