@@ -38,7 +38,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 12 | `Disciplines` global catalog | 1 | [x] |
 | 13 | Branch offered-disciplines replace-set | 11, 12 | [x] |
 | 14 | `Plans` module with branch/discipline joins | 13 | [x] |
-| 15 | `Subscriptions` module | 5, 14 | [ ] |
+| 15 | `Subscriptions` module | 5, 14 | [x] |
 | 16 | `Payments` module | 10, 15 | [ ] |
 | 17 | Derived overdue on read | 16 | [ ] |
 | 18 | `AccessLogs` module | 11, 17 | [ ] |
