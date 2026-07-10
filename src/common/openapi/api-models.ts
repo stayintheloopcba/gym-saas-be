@@ -561,3 +561,26 @@ export class MemberRoutineModel extends AssignmentModel {
   @ApiProperty({ type: RoutineModel })
   routine: RoutineModel;
 }
+
+export class ProgressEntryModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ format: 'uuid', nullable: true })
+  routineItemId: string | null;
+
+  @ApiProperty({ example: 82.5 })
+  value: number;
+
+  @ApiProperty({ type: Number, nullable: true })
+  reps: number | null;
+
+  @ApiProperty({ format: 'date-time' })
+  recordedAt: Date;
+}

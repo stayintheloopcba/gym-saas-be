@@ -8,6 +8,14 @@ export class RoutineNotFoundError extends DomainError {
   }
 }
 
+export class RoutineItemNotFoundError extends DomainError {
+  readonly status = 404;
+
+  constructor(identifier: string) {
+    super(`Routine item not found: ${identifier}`);
+  }
+}
+
 /** `PERSONAL` requiere `ownerMemberId`. */
 export class RoutineOwnerRequiredError extends DomainError {
   readonly status = 409;

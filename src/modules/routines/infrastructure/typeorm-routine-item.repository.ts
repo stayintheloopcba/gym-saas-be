@@ -8,6 +8,10 @@ import { RoutineItemInput, RoutineItemRepository } from '../domain/routine-item.
 export class TypeOrmRoutineItemRepository implements RoutineItemRepository {
   constructor(@InjectRepository(RoutineItem) private readonly repo: Repository<RoutineItem>) {}
 
+  findById(gymId: string, id: string): Promise<RoutineItem | null> {
+    return this.repo.findOne({ where: { id, gymId } });
+  }
+
   listByRoutine(routineId: string): Promise<RoutineItem[]> {
     return this.repo.find({ where: { routineId }, order: { order: 'ASC' } });
   }

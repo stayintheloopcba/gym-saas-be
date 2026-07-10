@@ -19,6 +19,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { PlansModule } from './modules/plans/plans.module';
 import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
+import { ProgressModule } from './modules/progress/progress.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { RoutinesModule } from './modules/routines/routines.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -51,6 +52,7 @@ import { UsersModule } from './modules/users/users.module';
     PaymentsModule,
     AccessLogsModule,
     RoutinesModule,
+    ProgressModule,
     StorageModule,
   ],
   controllers: [AppController],
