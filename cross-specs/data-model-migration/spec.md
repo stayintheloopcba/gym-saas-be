@@ -28,7 +28,7 @@ evolves via TypeORM `synchronize` + idempotent seeders — no data migrations
 | 2 | Rename permission codes `organization:*` → `gym:*` (permission-key, seeder, decorators, tests) | 1 | [x] |
 | 3 | `Member` entity + repository port | 1 | [x] |
 | 4 | Repoint RBAC resolution to `members` | 3 | [x] |
-| 5 | Members CRUD endpoints | 3 | [ ] |
+| 5 | Members CRUD endpoints | 3 | [x] |
 | 6 | Member role-change + grant-portal-access endpoints | 5 | [ ] |
 | 7 | `POST /gyms` creates owner Member in same unit of work | 3, 4 | [ ] |
 | 8 | Delete `memberships` module | 4, 6, 7 | [ ] |
