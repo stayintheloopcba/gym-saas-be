@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -27,19 +28,23 @@ import { RequirePermissions } from '../../../common/decorators/require-permissio
 import { DomainExceptionFilter } from '../../../common/errors/domain-exception.filter';
 import { ActiveGymGuard } from '../../../common/guards/active-gym.guard';
 import { PermissionGuard } from '../../../common/guards/permission.guard';
-import { BranchModel, ErrorResponseModel } from '../../../common/openapi/api-models';
+import { BranchModel, DisciplineModel, ErrorResponseModel } from '../../../common/openapi/api-models';
 import { ACCESS_TOKEN_SECURITY, ACTIVE_GYM_SECURITY } from '../../../config/openapi.config';
 import { CurrentUser } from '../../auth/interfaces/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/interfaces/jwt-auth.guard';
+import type { DisciplineView } from '../../disciplines/interfaces/discipline.view';
 import { PERMISSIONS } from '../../permissions/domain/permission-key';
 import type { UserPublicProfile } from '../../users/application/user-public-profile';
 import { CreateBranchUseCase } from '../application/create-branch.use-case';
+import { GetBranchDisciplinesUseCase } from '../application/get-branch-disciplines.use-case';
 import { GetBranchUseCase } from '../application/get-branch.use-case';
 import { ListBranchesUseCase } from '../application/list-branches.use-case';
 import { RemoveBranchUseCase } from '../application/remove-branch.use-case';
+import { ReplaceBranchDisciplinesUseCase } from '../application/replace-branch-disciplines.use-case';
 import { UpdateBranchUseCase } from '../application/update-branch.use-case';
 import { BranchView } from './branch.view';
 import { CreateBranchDto } from './dto/create-branch.dto';
+import { ReplaceBranchDisciplinesDto } from './dto/replace-branch-disciplines.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 
 @Controller('gyms/:id/branches')
@@ -55,6 +60,8 @@ export class BranchesController {
     private readonly getBranch: GetBranchUseCase,
     private readonly updateBranch: UpdateBranchUseCase,
     private readonly removeBranch: RemoveBranchUseCase,
+    private readonly getBranchDisciplines: GetBranchDisciplinesUseCase,
+    private readonly replaceBranchDisciplines: ReplaceBranchDisciplinesUseCase,
   ) {}
 
   @Post()
@@ -113,6 +120,39 @@ export class BranchesController {
     @Body() dto: UpdateBranchDto,
   ): Promise<BranchView> {
     return this.updateBranch.execute({ callerUserId: user.id, gymId, branchId, ...dto });
+  }
+
+  @Get(':branchId/disciplines')
+  @RequirePermissions(PERMISSIONS.BRANCHES_READ)
+  @ApiOperation({ summary: 'List the disciplines offered at a branch' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'branchId', format: 'uuid' })
+  @ApiOkResponse({ type: DisciplineModel, isArray: true })
+  @ApiForbiddenResponse({ type: ErrorResponseModel })
+  @ApiNotFoundResponse({ type: ErrorResponseModel })
+  getDisciplines(
+    @CurrentUser() user: UserPublicProfile,
+    @Param('id', ParseUUIDPipe) gymId: string,
+    @Param('branchId', ParseUUIDPipe) branchId: string,
+  ): Promise<DisciplineView[]> {
+    return this.getBranchDisciplines.execute(user.id, gymId, branchId);
+  }
+
+  @Put(':branchId/disciplines')
+  @RequirePermissions(PERMISSIONS.BRANCHES_MANAGE)
+  @ApiOperation({ summary: 'Replace the set of disciplines offered at a branch' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'branchId', format: 'uuid' })
+  @ApiOkResponse({ type: DisciplineModel, isArray: true })
+  @ApiForbiddenResponse({ type: ErrorResponseModel })
+  @ApiNotFoundResponse({ type: ErrorResponseModel })
+  replaceDisciplines(
+    @CurrentUser() user: UserPublicProfile,
+    @Param('id', ParseUUIDPipe) gymId: string,
+    @Param('branchId', ParseUUIDPipe) branchId: string,
+    @Body() dto: ReplaceBranchDisciplinesDto,
+  ): Promise<DisciplineView[]> {
+    return this.replaceBranchDisciplines.execute(user.id, gymId, branchId, dto.disciplineIds);
   }
 
   @Delete(':branchId')
