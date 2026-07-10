@@ -297,6 +297,29 @@ export class PaymentModel {
   metadata: Record<string, unknown> | null;
 }
 
+export class AccessLogModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  branchId: string | null;
+
+  @ApiProperty({ format: 'date-time' })
+  timestamp: Date;
+
+  @ApiProperty({ enum: ['GRANTED', 'DENIED'] })
+  result: string;
+
+  @ApiProperty({ type: String, nullable: true, example: 'overdue' })
+  reason: string | null;
+}
+
 export class MemberModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
