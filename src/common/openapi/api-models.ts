@@ -256,6 +256,47 @@ export class SubscriptionModel {
   createdAt: Date;
 }
 
+export class PaymentModel {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  gymId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  memberId: string;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  subscriptionId: string | null;
+
+  @ApiProperty({ example: 45000 })
+  amount: number;
+
+  @ApiProperty({ example: 'ARS' })
+  currency: string;
+
+  @ApiProperty({ enum: ['CASH', 'CARD', 'TRANSFER'] })
+  method: string;
+
+  @ApiProperty({ enum: ['PAID', 'PENDING', 'VOID'] })
+  status: string;
+
+  @ApiProperty({ format: 'date-time' })
+  paidAt: Date;
+
+  @ApiProperty({ type: String, format: 'date' })
+  periodStart: string;
+
+  @ApiProperty({ type: String, format: 'date' })
+  periodEnd: string;
+
+  @ApiProperty({ type: Number, nullable: true })
+  lateFee: number | null;
+
+  @ApiProperty({ type: Object, nullable: true })
+  metadata: Record<string, unknown> | null;
+}
+
 export class MemberModel {
   @ApiProperty({ format: 'uuid' })
   id: string;
