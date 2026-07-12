@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 import { authContextStorage } from '../context/auth-context.store';
 import { StructuredLogger } from '../logging/structured-logger.service';
+import { DuplicateEmailError, UserNotFoundError } from '../../modules/users/domain/user.errors';
 
 /** Forma uniforme de toda respuesta de error de la API. */
 export interface ErrorResponseBody {
@@ -74,6 +75,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof EntityNotFoundError) {
       return { statusCode: HttpStatus.NOT_FOUND, error: 'Not Found', message: 'Resource not found' };
+    }
+
+    if (exception instanceof DuplicateEmailError) {
+      return { statusCode: HttpStatus.CONFLICT, error: 'Conflict', message: exception.message };
+    }
+
+    if (exception instanceof UserNotFoundError) {
+      return { statusCode: HttpStatus.NOT_FOUND, error: 'Not Found', message: exception.message };
     }
 
     if (exception instanceof QueryFailedError) {

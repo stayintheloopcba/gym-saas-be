@@ -21,4 +21,4 @@ Validate and complete the cookie-based authentication, session, onboarding, gym-
 | 2 | Extend auth e2e coverage for local authentication, refresh rotation, rejection, logout, and cookie assertions. | 1 | [x] |
 | 3 | Cover Google-provisioned users and onboarding status. | 1 | [x] |
 | 4 | Document non-secret frontend, CORS, cookie, and Google callback configuration. | 1 | [x] |
-| 5 | Run backend quality checks and inspect the generated OpenAPI contract. | 2, 3, 4 | [ ] |
+| 5 | Run backend quality checks and inspect the generated OpenAPI contract. | 2, 3, 4 | [x] |

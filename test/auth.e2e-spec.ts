@@ -58,11 +58,15 @@ describe('Auth (e2e)', () => {
   });
 
   it('logs in and reaches /auth/me with the session cookie', async () => {
-    const agent = request.agent(app.getHttpServer());
+    const login = await request(app.getHttpServer()).post('/auth/login').send({ email, password }).expect(200);
+    const accessCookie = (login.headers['set-cookie'] as unknown as string[]).find((cookie) =>
+      cookie.startsWith('access_token='),
+    );
 
-    await agent.post('/auth/login').send({ email, password }).expect(200);
-
-    const me = await agent.get('/auth/me').expect(200);
+    const me = await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Cookie', accessCookie as string)
+      .expect(200);
     expect(me.body.email).toBe(email);
   });
 
@@ -98,17 +102,25 @@ describe('Auth (e2e)', () => {
   });
 
   it('logs out idempotently, clearing session and active-gym cookies', async () => {
-    const agent = request.agent(app.getHttpServer());
-    await agent.post('/auth/login').send({ email, password }).expect(200);
+    const login = await request(app.getHttpServer()).post('/auth/login').send({ email, password }).expect(200);
+    const loginCookies = login.headers['set-cookie'] as unknown as string[];
+    const accessCookie = loginCookies.find((cookie) => cookie.startsWith('access_token='));
+    const refreshCookie = loginCookies.find((cookie) => cookie.startsWith('refresh_token='));
 
-    const logout = await agent.post('/auth/logout').expect(200);
+    const logout = await request(app.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', refreshCookie as string)
+      .expect(200);
     expect(logout.body).toEqual({ success: true });
     const clearedCookies = logout.headers['set-cookie'] as unknown as string[];
     expect(clearedCookies.some((cookie) => cookie.startsWith('access_token='))).toBe(true);
     expect(clearedCookies.some((cookie) => cookie.startsWith('refresh_token='))).toBe(true);
     expect(clearedCookies.some((cookie) => cookie.startsWith('active_gym='))).toBe(true);
 
-    await agent.get('/auth/me').expect(401);
+    await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Cookie', accessCookie as string)
+      .expect(401);
     await request(app.getHttpServer()).post('/auth/logout').expect(200);
   });
 
