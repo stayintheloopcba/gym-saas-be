@@ -5,6 +5,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AllExceptionsFilter } from './../src/common/filters/all-exceptions.filter';
 import { AppModule } from './../src/app.module';
+import { GoogleAuthUseCase } from './../src/modules/auth/application/google-auth.use-case';
 
 /**
  * Flujo de auth de punta a punta: register → login → /auth/me con cookie jar.
@@ -73,5 +74,83 @@ describe('Auth (e2e)', () => {
   it('rejects login with a wrong password', async () => {
     const res = await request(app.getHttpServer()).post('/auth/login').send({ email, password: 'wrongpass' });
     expect(res.status).toBe(401);
+  });
+
+  it('rotates refresh cookies and rejects reuse of a rotated refresh token', async () => {
+    const login = await request(app.getHttpServer()).post('/auth/login').send({ email, password }).expect(200);
+    const initialRefresh = (login.headers['set-cookie'] as unknown as string[]).find((cookie) =>
+      cookie.startsWith('refresh_token='),
+    );
+    expect(initialRefresh).toBeDefined();
+
+    const refreshed = await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .set('Cookie', initialRefresh as string)
+      .expect(200);
+    const cookies = refreshed.headers['set-cookie'] as unknown as string[];
+    expect(cookies.find((cookie) => cookie.startsWith('access_token='))?.toLowerCase()).toContain('httponly');
+    expect(cookies.find((cookie) => cookie.startsWith('refresh_token='))?.toLowerCase()).toContain('path=/auth');
+
+    await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .set('Cookie', initialRefresh as string)
+      .expect(401);
+  });
+
+  it('logs out idempotently, clearing session and active-gym cookies', async () => {
+    const agent = request.agent(app.getHttpServer());
+    await agent.post('/auth/login').send({ email, password }).expect(200);
+
+    const logout = await agent.post('/auth/logout').expect(200);
+    expect(logout.body).toEqual({ success: true });
+    const clearedCookies = logout.headers['set-cookie'] as unknown as string[];
+    expect(clearedCookies.some((cookie) => cookie.startsWith('access_token='))).toBe(true);
+    expect(clearedCookies.some((cookie) => cookie.startsWith('refresh_token='))).toBe(true);
+    expect(clearedCookies.some((cookie) => cookie.startsWith('active_gym='))).toBe(true);
+
+    await agent.get('/auth/me').expect(401);
+    await request(app.getHttpServer()).post('/auth/logout').expect(200);
+  });
+
+  it('reports onboarding for new and returning Google users and links a local account by email', async () => {
+    const google = app.get(GoogleAuthUseCase);
+    const googleEmail = `google_${Date.now()}@example.com`;
+    const firstGoogleLogin = await google.execute({
+      googleId: `google-${Date.now()}`,
+      email: googleEmail,
+      name: 'Google User',
+    });
+    const onboarding = await request(app.getHttpServer())
+      .get('/onboarding/status')
+      .set('Cookie', `access_token=${firstGoogleLogin.tokens.accessToken}`)
+      .expect(200);
+    expect(onboarding.body).toMatchObject({
+      needsOnboarding: true,
+      gymsCount: 0,
+      hasActiveGym: false,
+      activeGymId: null,
+    });
+
+    const returningGoogleId = `returning-${Date.now()}`;
+    const returningGoogleEmail = `returning_${Date.now()}@example.com`;
+    const returningGoogleLogin = await google.execute({
+      googleId: returningGoogleId,
+      email: returningGoogleEmail,
+      name: 'Returning User',
+    });
+    const sameGoogleLogin = await google.execute({
+      googleId: returningGoogleId,
+      email: returningGoogleEmail,
+      name: 'Returning User',
+    });
+    expect(sameGoogleLogin.user.id).toBe(returningGoogleLogin.user.id);
+
+    const localEmail = `linked_${Date.now()}@example.com`;
+    const local = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ email: localEmail, password, name: 'Linked Local', gymName: 'Linked Gym' })
+      .expect(201);
+    const linked = await google.execute({ googleId: `linked-${Date.now()}`, email: localEmail, name: 'Linked Local' });
+    expect(linked.user.id).toBe(local.body.id);
   });
 });
