@@ -22,3 +22,7 @@ Validate and complete the cookie-based authentication, session, onboarding, gym-
 | 3 | Cover Google-provisioned users and onboarding status. | 1 | [x] |
 | 4 | Document non-secret frontend, CORS, cookie, and Google callback configuration. | 1 | [x] |
 | 5 | Run backend quality checks and inspect the generated OpenAPI contract. | 2, 3, 4 | [x] |
+
+### Error de registro
+
+Cuando `POST /auth/register` recibe un email ya registrado, responde `409` con el envelope de error estándar y `code: "EMAIL_ALREADY_REGISTERED"`. El mensaje no incluye el email enviado. El frontend usa ese código estable para asociar el error al campo `email`; los errores de validación (`400`) se muestran en el campo correspondiente y los límites (`429`) como aviso de formulario.

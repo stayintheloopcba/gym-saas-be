@@ -3,6 +3,7 @@ import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 import { authContextStorage } from '../context/auth-context.store';
 import { StructuredLogger } from '../logging/structured-logger.service';
 import { AllExceptionsFilter, ErrorResponseBody } from './all-exceptions.filter';
+import { DuplicateEmailError } from '../../modules/users/domain/user.errors';
 
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
@@ -91,6 +92,14 @@ describe('AllExceptionsFilter', () => {
 
     expect(status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
     expect(captureBody().error).toBe('Conflict');
+  });
+
+  it('exposes a stable, non-sensitive code for a duplicate email', () => {
+    filter.catch(new DuplicateEmailError('ada@example.com'), host);
+
+    expect(status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
+    expect(captureBody()).toMatchObject({ code: 'EMAIL_ALREADY_REGISTERED', message: 'An account with this email already exists' });
+    expect(JSON.stringify(captureBody())).not.toContain('ada@example.com');
   });
 
   it('maps an unknown error to 500', () => {

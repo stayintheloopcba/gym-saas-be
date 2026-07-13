@@ -55,6 +55,8 @@ describe('Auth (e2e)', () => {
       .post('/auth/register')
       .send({ email, password, name: 'E2E', gymName: 'E2E Gym' });
     expect(res.status).toBe(409);
+    expect(res.body).toMatchObject({ code: 'EMAIL_ALREADY_REGISTERED' });
+    expect(JSON.stringify(res.body)).not.toContain(email);
   });
 
   it('logs in and reaches /auth/me with the session cookie', async () => {

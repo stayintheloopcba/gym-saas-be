@@ -10,6 +10,7 @@ export interface ErrorResponseBody {
   requestId: string;
   statusCode: number;
   error: string;
+  code?: string;
   message: string | string[];
   timestamp: string;
   path: string;
@@ -18,6 +19,7 @@ export interface ErrorResponseBody {
 interface ResolvedError {
   statusCode: number;
   error: string;
+  code?: string;
   message: string | string[];
 }
 
@@ -37,7 +39,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const requestContext = authContextStorage.getStore();
     const requestId = requestContext?.requestId ?? 'unknown';
 
-    const { statusCode, error, message } = this.resolve(exception);
+    const { statusCode, error, code, message } = this.resolve(exception);
 
     if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.logError(
@@ -60,6 +62,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       requestId,
       statusCode,
       error,
+      ...(code ? { code } : {}),
       message,
       timestamp: new Date().toISOString(),
       path: this.pathWithoutQuery(request),
@@ -78,7 +81,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     if (exception instanceof DuplicateEmailError) {
-      return { statusCode: HttpStatus.CONFLICT, error: 'Conflict', message: exception.message };
+      return {
+        statusCode: HttpStatus.CONFLICT,
+        error: 'Conflict',
+        code: 'EMAIL_ALREADY_REGISTERED',
+        message: 'An account with this email already exists',
+      };
     }
 
     if (exception instanceof UserNotFoundError) {
