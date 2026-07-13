@@ -117,6 +117,7 @@ export class AuthController {
     const refreshToken = (req.cookies as Record<string, string> | undefined)?.[REFRESH_TOKEN_COOKIE];
     await this.logoutUseCase.execute(refreshToken);
     this.cookies.clearSessionCookies(res);
+    this.activeGymCookie.clear(res);
     return { success: true };
   }
 

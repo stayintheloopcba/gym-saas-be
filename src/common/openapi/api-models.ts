@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AuthProvider } from '../enums/auth-provider.enum';
 
 export class RoleSummaryModel {
@@ -21,6 +21,9 @@ export class ErrorResponseModel {
 
   @ApiProperty({ example: 'Bad Request' })
   error: string;
+
+  @ApiPropertyOptional({ example: 'EMAIL_ALREADY_REGISTERED', description: 'Stable, machine-readable error code when available.' })
+  code?: string;
 
   @ApiProperty({ oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }] })
   message: string | string[];
